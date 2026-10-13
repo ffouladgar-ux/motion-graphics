@@ -110,7 +110,7 @@ async function main() {
     const api = {
       s,
       anim: (name, click, fx, delay = 0, extra = {}) => steps.push({ name, click, fx, delay, ...extra }),
-      title: (text, click = 0, fx = "rise") => {
+      title: (text, click = 0, fx = "pop") => {
         const dark = layout.startsWith("amber");
         s.addText(rich(text, dark ? COL.ink : COL.white, dark ? COL.white : COL.yellow), { placeholder: "title" });
         steps.push({ name: "@title", click, fx, delay: 0 });
@@ -184,7 +184,7 @@ async function main() {
       valign: "top",
     });
     t.anim("Tag", 0, "pop");
-    t.anim("Headline", 0, "rise", 150);
+    t.anim("Headline", 0, "pop", 150);
     const cards = [
       { n: "Price", label: "Price", note: "It is not price.", rot: -6, x: 7.75, y: 1.0, c: 1 },
       { n: "Quality", label: "Quality", note: "It is not quality.", rot: 4, x: 9.55, y: 1.55, c: 2 },
@@ -226,6 +226,7 @@ async function main() {
       { x: 7.9, y: 4.0, w: 4.7, h: 1.75, fill: COL.yellow, rotate: -2, valign: "middle" },
     );
     t.anim("Transformation", 3, "pop");
+    t.anim("Transformation", 3, "pulse", 650);
     t.big("Sub", "People buy the transformation your product really gives them.", {
       x: X,
       y: 4.85,
@@ -235,18 +236,19 @@ async function main() {
       bold: false,
       valign: "top",
     });
-    t.anim("Sub", 4, "rise");
+    t.anim("Sub", 4, "pop");
   }
 
   // 2 ── The 157 dollar customer
   {
-    const t = slide("coral", "157 dollars to get one customer.\nThe number builds in by itself; no clicks on this slide.");
+    const t = slide("coral", "157 dollars to get one customer.\nClick 1: $157.  Click 2: to get one customer.");
     t.tag("Tag", "The 157 dollar customer", 1.0);
     t.big("Number", "$157", { x: X - 0.1, y: 1.65, w: 9, h: 3.4, fontSize: 250, charSpacing: -6 });
     t.big("Line", rich("to get *one* customer.", COL.white), { x: X, y: 5.15, w: 10, h: 1.0, fontSize: 48 });
     t.anim("Tag", 0, "pop");
-    t.anim("Number", 0, "pop", 200, { dur: 600 });
-    t.anim("Line", 0, "rise", 650);
+    t.anim("Number", 1, "pop", 0, { dur: 650 });
+    t.anim("Line", 2, "pop");
+    t.anim("Number", 2, "pulse", 450);
   }
 
   // 3 ── Three fixes
@@ -279,6 +281,7 @@ async function main() {
     });
     t.tag("Footer", "Same customer, more money", 6.15, { bg: COL.yellow, color: COL.ink });
     t.anim("Footer", 4, "pop");
+    t.anim("Fix 3", 4, "pulse", 450);
   }
 
   // 4 ── The question
@@ -286,7 +289,7 @@ async function main() {
     const t = slide(
       "purple-title",
       "Three fixes, three worse numbers, because the ads were never the problem.\n" +
-        "Click 1: Nobody asked the only question that matters: what does the customer actually get.",
+        "Click 1: never.  Click 2: Nobody asked the only question that matters.  Click 3: what does the customer actually get.",
     );
     t.title("The ads were never the problem.");
     // underline under "never": "The ads were " is 4.59in wide at 50pt Arial bold
@@ -299,7 +302,7 @@ async function main() {
       rectRadius: 0.06,
       fill: { color: COL.yellow },
     });
-    t.anim("Underline", 0, "wipe", 500);
+    t.anim("Underline", 1, "wipe");
     t.tag("Tag", "The only question that matters", 2.75, { bg: COL.white, color: COL.ink });
     t.s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
       objectName: "Question card",
@@ -329,10 +332,10 @@ async function main() {
         fill: { color: c },
       }),
     );
-    t.anim("Tag", 1, "pop");
-    t.anim("Question card", 1, "pop", 200);
-    [1, 2, 3].forEach((i) => t.anim(`Dot ${i}`, 1, "fade", 450));
-    t.anim("Question", 1, "type", 650); // types on letter by letter once the card lands
+    t.anim("Tag", 2, "pop");
+    t.anim("Question card", 3, "pop");
+    [1, 2, 3].forEach((i) => t.anim(`Dot ${i}`, 3, "pop", 350 + i * 80));
+    t.anim("Question", 3, "type", 650); // types on letter by letter once the card lands
   }
 
   // 5 ── One sentence
@@ -369,7 +372,7 @@ async function main() {
         valign: "middle",
         margin: 0,
       });
-      t.anim(`Row ${i + 1}`, i + 1, "wipe");
+      t.anim(`Row ${i + 1}`, i + 1, "pop");
       t.anim(`Tick ${i + 1}`, i + 1, "pop", 350);
     });
     t.card(
@@ -380,14 +383,15 @@ async function main() {
       ],
       { x: 8.15, y: 2.6, w: 4.4, h: 3.5, fill: COL.ink, color: COL.white, align: "center", valign: "middle", rotate: 3 },
     );
-    t.anim("One", 4, "pop", 0, { dur: 550 });
+    t.anim("One", 4, "pop", 0, { dur: 650 });
+    t.anim("One", 4, "pulse", 750);
   }
 
   // 6 ── 42. 18. 3.58.
   {
     const t = slide(
       "green",
-      "Same product. Same audience. Same budget.\nClick 1: 42.  Click 2: 18.  Click 3: 3.58.  Click 4: from one sentence.\n" +
+      "Same product. Same audience. Same budget.\nClick 1: 157.  Click 2: 42.  Click 3: 18.  Click 4: 3.58.  Click 5: from one sentence.\n" +
         "Note: the Short gives these numbers without a label; 'cost per customer' is inferred from the title (157 dollars to 3.58).",
     );
     t.tag("Tag", "Cost per customer", 0.9);
@@ -425,17 +429,18 @@ async function main() {
         });
       }
       if (i === 0) {
-        t.anim("Value 0", 0, "pop", 200, { dur: 600 });
-        t.anim("Chip 0", 0, "pop", 500);
+        t.anim("Value 0", 1, "pop", 0, { dur: 650 });
+        t.anim("Chip 0", 1, "pop", 300);
       } else {
-        t.anim(`Value ${i - 1}`, i, "exit");
-        t.anim(`Value ${i}`, i, "pop", 120);
-        t.anim(`Strike ${i - 1}`, i, "wipe", 0, { dur: 300 });
-        t.anim(`Chip ${i}`, i, "pop", 250);
+        t.anim(`Value ${i - 1}`, i + 1, "exit");
+        t.anim(`Value ${i}`, i + 1, "pop", 120);
+        t.anim(`Strike ${i - 1}`, i + 1, "wipe", 0, { dur: 300 });
+        t.anim(`Chip ${i}`, i + 1, "pop", 250);
       }
     });
     t.big("Footer", rich("From *one sentence.*", COL.white), { x: X, y: 5.85, w: 10, h: 0.9, fontSize: 44 });
-    t.anim("Footer", 4, "rise");
+    t.anim("Footer", 5, "pop");
+    t.anim("Value 3", 5, "pulse", 450);
   }
 
   // 7 ── Three drills
@@ -460,17 +465,18 @@ async function main() {
     });
     t.tag("Footer", "He is not reading the boxes", 6.3, { bg: COL.yellow, color: COL.ink });
     t.anim("Footer", 4, "pop");
+    [1, 2, 3].forEach((i) => t.anim(`Drill ${i}`, 4, "pulse", 300 + i * 120));
   }
 
   // 8 ── He is buying
   {
     const t = slide(
       "amber-title",
-      "He is not buying the drill.\nClicks 1–3: He is buying his garage, the shelf finally level, and the job done.\nClick 4: The drill is just the tool.",
+      "He is not buying the drill.\nClick 1: He is buying:  Clicks 2–4: his garage, the shelf finally level, and the job done.\nClick 5: The drill is just the tool.",
     );
     t.title("He is not buying *the drill.*");
     t.big("Buying", "He is buying:", { x: X, y: 2.45, w: 6, h: 0.6, fontSize: 26, color: COL.ink });
-    t.anim("Buying", 0, "fade", 500);
+    t.anim("Buying", 1, "pop");
     ["His garage", "The shelf finally level", "The job done"].forEach((label, i) => {
       const y = 3.2 + i * 1.02;
       t.card(`Row ${i + 1}`, [{ text: label, options: { fontSize: 28, bold: true } }], {
@@ -498,8 +504,8 @@ async function main() {
         valign: "middle",
         margin: 0,
       });
-      t.anim(`Row ${i + 1}`, i + 1, "wipe");
-      t.anim(`Tick ${i + 1}`, i + 1, "pop", 350);
+      t.anim(`Row ${i + 1}`, i + 2, "pop");
+      t.anim(`Tick ${i + 1}`, i + 2, "pop", 350);
     });
     t.card(
       "Tool",
@@ -509,7 +515,8 @@ async function main() {
       ],
       { x: 8.2, y: 3.0, w: 4.35, h: 2.6, fill: COL.ink, color: COL.white, valign: "middle", rotate: 3, margin: [24, 32, 24, 32] },
     );
-    t.anim("Tool", 4, "pop", 0, { dur: 550 });
+    t.anim("Tool", 5, "pop", 0, { dur: 650 });
+    t.anim("Tool", 5, "pulse", 750);
   }
 
   // 9 ── The taxi
@@ -517,7 +524,7 @@ async function main() {
     const t = slide(
       "purple-title",
       "Nobody buys a ride in the taxi.\nClick 1: They are buying a ride home.\n" +
-        "Click 2: Nobody buys your service for the service. They are buying the identity you hand them.",
+        "Click 2: Nobody buys your service for the service.  Click 3: They are buying the identity you hand them.",
     );
     t.title("Nobody buys a ride *in the taxi.*");
     t.card(
@@ -532,14 +539,23 @@ async function main() {
     t.card(
       "Identity",
       [
-        { text: "NOBODY BUYS YOUR SERVICE FOR THE SERVICE", options: { fontFace: MONO, fontSize: 13, charSpacing: 2, color: "BDB8C8", breakLine: true } },
         { text: "They are buying the ", options: { fontSize: 36, bold: true } },
         { text: "identity", options: { fontSize: 36, bold: true, color: COL.yellow } },
         { text: " you hand them.", options: { fontSize: 36, bold: true } },
       ],
-      { x: 6.75, y: 3.35, w: 5.85, h: 2.75, fill: COL.ink, color: COL.white, valign: "middle", rotate: 2, margin: [24, 34, 24, 34] },
+      { x: 6.75, y: 3.75, w: 5.85, h: 2.3, fill: COL.ink, color: COL.white, valign: "middle", rotate: 2, margin: [24, 34, 24, 34] },
     );
-    t.anim("Identity", 2, "pop");
+    t.big(
+      "Service",
+      [
+        { text: "Nobody buys your service", options: { breakLine: true } },
+        { text: "for the service.", options: {} },
+      ],
+      { x: 6.75, y: 2.45, w: 5.85, h: 0.95, fontSize: 24, valign: "top" },
+    );
+    t.anim("Service", 2, "pop");
+    t.anim("Identity", 3, "pop");
+    t.anim("Identity", 3, "pulse", 650);
   }
 
   // 10 ── The two second pause
@@ -547,8 +563,8 @@ async function main() {
     const t = slide(
       "coral-title",
       "There is a two second pause that costs business owners more money than any competitor.\n" +
-        "Click 1: They go quiet.  Click 2: And you fill the silence with a discount.\n" +
-        "Click 3: Fill the pause with the transformation and the discount never comes up.",
+        "Click 1: They go quiet.  Click 2: And you fill the silence with a discount.  Click 3: not that.\n" +
+        "Click 4: Fill the pause with the transformation and the discount never comes up.",
     );
     t.title("Someone asks *your price.*");
     t.card(
@@ -569,7 +585,24 @@ async function main() {
       ],
       { x: 4.85, y: 2.6, w: 7.75, h: 1.55, valign: "middle", r: 0.25 },
     );
-    t.anim("Discount", 2, "rise");
+    t.anim("Discount", 2, "pop");
+    t.s.addText("✕", {
+      objectName: "Discount X",
+      isTextBox: true,
+      shape: pres.shapes.OVAL,
+      x: 12.05,
+      y: 2.35,
+      w: 0.75,
+      h: 0.75,
+      fill: { color: COL.red },
+      color: COL.white,
+      fontSize: 24,
+      bold: true,
+      align: "center",
+      valign: "middle",
+      margin: 0,
+    });
+    t.anim("Discount X", 3, "pop");
     t.card(
       "Instead",
       [
@@ -578,7 +611,8 @@ async function main() {
       ],
       { x: 4.85, y: 4.4, w: 7.75, h: 1.75, fill: COL.yellow, valign: "middle", r: 0.25 },
     );
-    t.anim("Instead", 3, "pop");
+    t.anim("Instead", 4, "pop");
+    t.anim("Instead", 4, "pulse", 650);
   }
 
   // 11 ── Close
@@ -586,11 +620,11 @@ async function main() {
     const t = slide(
       "teal-title",
       "People buy the transformation your product really gives them.\n" +
-        "Clicks 1–3: Name the transformation they are buying, then make every page, every price and every word show it.\nClick 4: WIN-WIN.",
+        "Click 1: then make it show.  Clicks 2–4: every page, every price and every word.\nClick 5: WIN-WIN.",
     );
     t.title("Name the transformation *they are buying.*");
     t.big("Then", "Then make it show in", { x: X, y: 3.05, w: 8, h: 0.6, fontSize: 26 });
-    t.anim("Then", 0, "fade", 500);
+    t.anim("Then", 1, "pop");
     ["every page", "every price", "every word"].forEach((label, i) => {
       t.card(`Every ${i + 1}`, [{ text: label, options: { fontSize: 32, bold: true } }], {
         x: X + i * 3.55,
@@ -602,7 +636,7 @@ async function main() {
         rotate: [-2, 1, -1][i],
         r: 0.25,
       });
-      t.anim(`Every ${i + 1}`, i + 1, "pop");
+      t.anim(`Every ${i + 1}`, i + 2, "pop");
     });
     t.card("Badge", [{ text: "WIN-WIN", options: { fontSize: 66, bold: true } }], {
       x: X,
@@ -615,7 +649,8 @@ async function main() {
       rotate: -3,
       r: 0.35,
     });
-    t.anim("Badge", 4, "pop", 0, { dur: 600 });
+    t.anim("Badge", 5, "pop", 0, { dur: 650 });
+    t.anim("Badge", 5, "pulse", 750);
   }
 
   await pres.writeFile({ fileName: OUT });

@@ -21,13 +21,12 @@ function behaviors(fx, spid, dur, next) {
       .map(([tm, v]) => `<p:tav tm="${tm}"><p:val><p:strVal val="${v}"/></p:val></p:tav>`)
       .join("")}</p:tavLst></p:anim>`;
   switch (fx) {
-    case "pop": // zoom in with a small overshoot, the "spring" of the video style
-      return (
-        show +
-        anim("ppt_w", [[0, "0"], [70000, "#ppt_w*1.07"], [100000, "#ppt_w"]], dur) +
-        anim("ppt_h", [[0, "0"], [70000, "#ppt_h*1.07"], [100000, "#ppt_h"]], dur) +
-        fade(Math.round(dur * 0.5))
-      );
+    case "pop": { // zoom in, overshoot, settle back: the "spring" of the video style
+      const spring = (a) => [[0, "0"], [60000, `#${a}*1.14`], [82000, `#${a}*0.97`], [100000, `#${a}`]];
+      return show + anim("ppt_w", spring("ppt_w"), dur) + anim("ppt_h", spring("ppt_h"), dur) + fade(Math.round(dur * 0.4));
+    }
+    case "pulse": // quick grow-and-back on something already on screen
+      return `<p:animScale><p:cBhvr><p:cTn id="${next()}" dur="${dur}" autoRev="1" fill="hold"/>${tgt}</p:cBhvr><p:by x="112000" y="112000"/></p:animScale>`;
     case "rise":
       return (
         show +
@@ -61,8 +60,9 @@ const PRESET = {
   type: ["entr", 10, 0],
   wipe: ["entr", 22, 8],
   exit: ["exit", 10, 0],
+  pulse: ["emph", 6, 0],
 };
-const DUR = { pop: 450, rise: 500, fade: 400, type: 40, wipe: 500, exit: 250 };
+const DUR = { pulse: 180, pop: 550, rise: 500, fade: 400, type: 40, wipe: 500, exit: 250 };
 
 function timingXml(steps, idOf) {
   let n = 2;
@@ -89,7 +89,7 @@ function timingXml(steps, idOf) {
     return `<p:par><p:cTn id="${next()}" fill="hold"><p:stCondLst>${outerCond}</p:stCondLst><p:childTnLst><p:par><p:cTn id="${next()}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>${effects.join("")}</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>`;
   });
   const bld = [...new Map(steps.map((s) => [`${idOf(s.name)}-${s.fx === "exit" ? 1 : 0}`, s])).values()]
-    .filter((s) => idOf.isSp(s.name))
+    .filter((s) => s.fx !== "pulse" && idOf.isSp(s.name))
     .map((s) => `<p:bldP spid="${idOf(s.name)}" grpId="${s.fx === "exit" ? 1 : 0}" animBg="1"/>`)
     .join("");
   return (
@@ -114,7 +114,7 @@ async function animate(file, plan, transition = `<p:transition spd="med"><p:push
       if (m[1] === "sp") sp.add(m[3]);
     }
     // The title placeholder is addressed as "@title" (pptxgenjs gives it a generic name).
-    const ph = xml.match(/<p:cNvPr id="(\d+)" name="([^"]*)"(?:(?!<\/p:nvSpPr>)[\s\S])*<p:ph[^>]*type="title"/);
+    const ph = xml.match(/<p:nvSpPr><p:cNvPr id="(\d+)"(?:(?!<\/p:nvSpPr>)[\s\S])*<p:ph[^>]*type="title"/);
     if (ph) {
       ids.set("@title", ph[1]);
       sp.add("@title");
