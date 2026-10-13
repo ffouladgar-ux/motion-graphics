@@ -5,6 +5,7 @@ Motion-graphics skills for Claude Code. Each skill does one job. The first one i
 | Skill | What it does |
 |---|---|
 | `motion-broll` | Give it a video and a transcript and it makes motion-graphic B-roll timed to your words. |
+| `remotion-shorts` | Give it a script, caption or SRT and it makes a bold, colourful vertical Short (1080×1920) in Remotion. |
 
 More skills will be added to this repo.
 
@@ -62,6 +63,18 @@ It never invents numbers or results. Bars show relative size and text uses skele
 - Every frame is a pure function of time. Springs are closed-form step responses, and a value that changes target many times is the sum of one spring per change. There are no CSS transitions or timers, so any frame can be rendered on its own.
 - Clips are small HTML files on a shared engine (`skills/motion-broll/engine/motion.js`). Headless Chromium captures 4 sub-frames per frame across a 180° shutter, and ffmpeg blends them into motion blur.
 - The worked example in `skills/motion-broll/examples/opus-aoe2/` is the six clips from the demo above.
+
+## remotion-shorts
+
+**Vertical motion-graphic Shorts and Reels from your script, made in Remotion.** Each scene acts out one idea: a number counts up, options drop in as cards, a checklist ticks off as it's said, a question types itself, and every section gets its own bright gradient.
+
+```
+/remotion-shorts
+```
+
+Give it the script, the Short's caption, or an SRT of the voiceover. It plans the scenes in a table and waits for your OK. Then it fills in a single content file, renders an MP4, and checks a contact sheet of stills before handing it over. With an SRT, `scripts/srt_timing.py` times each scene to your voice. Without one, it times scenes to a reading pace and tells you so.
+
+A finished example is in `samples/one-sentence/`.
 
 ## Licence
 
