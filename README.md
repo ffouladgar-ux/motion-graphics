@@ -6,6 +6,7 @@ Motion-graphics skills for Claude Code. Each skill does one job. The first one i
 |---|---|
 | `motion-broll` | Give it a video and a transcript and it makes motion-graphic B-roll timed to your words. |
 | `remotion-shorts` | Give it a script, caption or SRT and it makes a bold, colourful vertical Short (1080×1920) in Remotion. |
+| `click-deck` | Give it a talk outline or script and it builds a 16:9 PowerPoint in the same style, where every point pops in on your click. |
 
 More skills will be added to this repo.
 
@@ -75,6 +76,18 @@ It never invents numbers or results. Bars show relative size and text uses skele
 Give it the script, the Short's caption, or an SRT of the voiceover. It plans the scenes in a table and waits for your OK. Then it fills in a single content file, renders an MP4, and checks a contact sheet of stills before handing it over. With an SRT, `scripts/srt_timing.py` times each scene to your voice. Without one, it times scenes to a reading pace and tells you so.
 
 A finished example is in `samples/one-sentence/`.
+
+## click-deck
+
+**A 16:9 PowerPoint you present point by point.** Same bold card style as the Shorts, but every point is a native PowerPoint animation on your click: cards pop in with a springy overshoot, rows tick off, a question types itself, the key reveal pulses. The speaker notes list what each click shows.
+
+```
+/click-deck
+```
+
+Give it an outline, a script or a video to turn into a talk. It plans one slide per idea and waits for your OK. Then it writes a short `deck.js` from twelve slide types (cover, stat, cards, question, checklist, steps, mystery, pair, contrast, points, statement, close). The kit measures every text so nothing overflows, and `check.py` confirms every element on every slide is animated.
+
+A finished 11-slide, 43-click example is in `skills/click-deck/examples/win-win/`.
 
 ## Licence
 
