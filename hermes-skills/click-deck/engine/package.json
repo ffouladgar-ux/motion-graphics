@@ -1,0 +1,9 @@
+{
+  "name": "click-deck-engine",
+  "private": true,
+  "dependencies": {
+    "jszip": "3.10.1",
+    "pptxgenjs": "3.12.0",
+    "sharp": "0.33.5"
+  }
+}

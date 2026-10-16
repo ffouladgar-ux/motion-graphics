@@ -89,6 +89,18 @@ Give it an outline, a script or a video to turn into a talk. It plans one slide 
 
 A finished 11-slide, 43-click example is in `skills/click-deck/examples/win-win/`.
 
+## For Hermes Agent
+
+`click-deck` also comes in a [Hermes Agent](https://github.com/NousResearch/hermes-agent) edition in `hermes-skills/click-deck/`. It uses the same engine, written to Hermes's skill standards: a 60-character description, Hermes tools (`terminal`, `read_file`, `vision_analyze`), and `${HERMES_SKILL_DIR}` paths.
+
+```
+hermes skills install ffouladgar-ux/motion-graphics/hermes-skills/click-deck
+```
+
+Or copy `hermes-skills/click-deck` into `~/.hermes/skills/creative/`. Start a new Hermes session afterwards; Hermes loads skills when a session starts.
+
+The engine lives in `skills/click-deck/`. After changing it, run `python3 scripts/sync_hermes.py` to update the Hermes copy (`--check` reports whether it's out of date).
+
 ## Licence
 
 MIT. Geist fonts: SIL Open Font License. Icon paths adapted from Lucide (ISC).
