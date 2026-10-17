@@ -385,25 +385,30 @@ const TYPES = {
     const gap = 0.4;
     const cw = (CONTENT_W - gap * (n - 1)) / n;
     const valuePt = n === 4 ? 52 : 66;
-    const labelPt = n === 4 ? 24 : 28;
+    const hasValues = o.cards.some((c) => c.value);
+    const wordsFit = (pt) => o.cards.every((c) => plain(c.label).split(/\s+/).every((w) => textWidth(w, pt) <= cw - 0.7));
+    const sizes = hasValues ? (n === 4 ? [22] : [28]) : n === 4 ? [32, 28, 24, 22] : [40, 34, 28];
+    const labelPt = sizes.find(wordsFit) ?? sizes[sizes.length - 1];
+    const notePt = hasValues ? 16 : 18;
+    const cardH = hasValues ? 3.0 : 2.5;
     const names = o.cards.map((c, i) => {
       t.click([c.label, c.note, c.value].filter(Boolean).join(" "));
-      t.fit(c.label, labelPt, cw - 0.7, 0.9);
+      t.fit(c.label, labelPt, cw - 0.7, hasValues ? 0.9 : 1.4);
       const name = t.card(
         [
           ...(c.kicker ? [{ text: c.kicker, options: { fontFace: MONO, fontSize: 13, color: COL.muted, charSpacing: 3, breakLine: true } }] : []),
           { text: c.label, options: { fontSize: labelPt, bold: true, breakLine: true } },
-          ...(c.note ? [{ text: c.note, options: { fontSize: 16, color: COL.muted, breakLine: !!c.value } }] : []),
+          ...(c.note ? [{ text: c.note, options: { fontSize: notePt, color: COL.muted, breakLine: !!c.value } }] : []),
           ...(c.value ? [{ text: c.value, options: { fontSize: valuePt, bold: true } }] : []),
         ],
-        { x: X + i * (cw + gap), y: t.top + 0.15, w: cw, h: 3.0, rotate: [-2, 1, -1, 2][i] },
+        { x: X + i * (cw + gap), y: t.top + 0.15, w: cw, h: cardH, rotate: [-2, 1, -1, 2][i], valign: hasValues ? "top" : "middle" },
       );
       t.anim(name);
       return name;
     });
     if (o.footer) {
       t.click(o.footer);
-      t.anim(t.tag(o.footer, Math.min(6.4, t.top + 3.75), { bg: COL.yellow, color: COL.ink }));
+      t.anim(t.tag(o.footer, Math.min(6.4, t.top + cardH + 0.75), { bg: COL.yellow, color: COL.ink }));
       if (o.stress != null) t.anim(names[o.stress], "pulse", 450);
     }
     t.done();
@@ -472,7 +477,7 @@ const TYPES = {
             { text: o.side.big, options: { fontSize: o.side.big.length <= 3 ? 150 : 54, bold: true, color: COL.yellow, breakLine: true } },
             { text: o.side.small, options: { fontSize: 26, bold: true } },
           ]
-        : [{ text: o.side.big, options: { fontSize: 44, bold: true } }];
+        : [{ text: o.side.big, options: { fontSize: [44, 38, 32, 28].find((p) => (lineCount(o.side.big, p, 3.7) * p * 1.2) / 72 <= 2.9) ?? 28, bold: true } }];
       const side = t.card(runs, { x: 8.15, y: t.top - 0.05, w: 4.4, h: 3.5, fill: COL.ink, color: COL.white, align: "center", valign: "middle", rotate: 3 });
       t.anim(side, "pop", 0, { dur: 650 });
       t.anim(side, "pulse", 750);
@@ -559,12 +564,13 @@ const TYPES = {
     t.title(o.title);
     const y = t.top + 0.2;
     t.click(o.left.text);
-    t.fit(o.left.text, 52, 4.8, 1.6);
+    const leftPt = lineCount(o.left.text, 52, 4.8) > 1 ? 44 : 52;
+    t.fit(o.left.text, leftPt, 4.8, 1.6);
     t.anim(
       t.card(
         [
           ...(o.left.kicker ? [{ text: o.left.kicker.toUpperCase(), options: { fontFace: MONO, fontSize: 14, charSpacing: 3, color: COL.muted, breakLine: true } }] : []),
-          ...rich(o.left.text, COL.ink, COL.red, { fontSize: 52, bold: true }),
+          ...rich(o.left.text, COL.ink, COL.red, { fontSize: leftPt, bold: true }),
         ],
         { x: X, y, w: 5.5, h: 2.6, valign: "middle", rotate: -2, margin: [34, 34, 24, 24] },
       ),
@@ -648,7 +654,12 @@ const TYPES = {
       const item = typeof it === "string" ? { label: it } : it;
       t.click([item.label, item.note].filter(Boolean).join(" — "));
       const y = t.top + i * (rowH + 0.18);
-      t.fit(item.label + (item.note ? ` ${item.note}` : ""), 26, 9.8, rowH, "bold", item.label);
+      const labelLines = t.fit(item.label, 26, 9.8, rowH);
+      if (item.note) {
+        const noteLines = lineCount(item.note, 16, 9.8, "regular");
+        if ((labelLines * 26 + noteLines * 16) * 1.2 / 72 > rowH + 0.05)
+          t.warn(`"${plain(item.label).slice(0, 40)}" plus its note may overflow its row; shorten one of them`);
+      }
       const row = t.card(
         [
           { text: item.label, options: { fontSize: 26, bold: true, breakLine: !!item.note } },
@@ -676,13 +687,15 @@ const TYPES = {
   /** Up to three short lines, one per click (a claim, a turn). Use it only when nothing more active fits. */
   statement(o) {
     const t = this._slide(o.bg ?? "purple", o);
-    if (o.tag) t.anim(t.tag(o.tag, 1.0));
     const pt = o.size ?? 64;
-    let y = o.tag ? 1.75 : 1.5;
-    o.lines.forEach((line) => {
+    const heights = o.lines.map((line) => (lineCount(line, pt, CONTENT_W) * pt * 1.15) / 72);
+    const block = heights.reduce((a, b) => a + b, 0) + 0.35 * (o.lines.length - 1);
+    let y = Math.max(o.tag ? 1.75 : 1.5, (H - block) / 2);
+    if (o.tag) t.anim(t.tag(o.tag, y - 0.75));
+    o.lines.forEach((line, i) => {
       t.click(line);
-      const lines = t.fit(line, pt, CONTENT_W, 2.4);
-      const h = (lines * pt * 1.15) / 72;
+      t.fit(line, pt, CONTENT_W, 2.4);
+      const h = heights[i];
       t.anim(t.text(line, { x: X, y, w: CONTENT_W, h, fontSize: pt }));
       y += h + 0.35;
     });
@@ -702,11 +715,13 @@ const TYPES = {
     }
     const chips = o.chips ?? [];
     const gap = 0.3;
-    const cw = Math.min(3.25, (CONTENT_W - gap * (chips.length - 1)) / Math.max(1, chips.length));
+    const cw = Math.min(3.7, (CONTENT_W - gap * (chips.length - 1)) / Math.max(1, chips.length));
+    // the card's inner padding takes ~0.6 in, so measure against cw - 0.7
+    const chipPt = [32, 28, 24].find((p) => chips.every((c) => lineCount(c, p, cw - 0.7) === 1)) ?? 24;
     chips.forEach((c, i) => {
       t.click(c);
-      t.fit(c, 32, cw - 0.4, 1.0);
-      t.anim(t.card([{ text: c, options: { fontSize: 32, bold: true } }], { x: X + i * (cw + gap), y, w: cw, h: 1.1, align: "center", valign: "middle", rotate: [-2, 1, -1, 2][i % 4], r: 0.25 }));
+      t.fit(c, chipPt, cw - 0.7, 1.0);
+      t.anim(t.card([{ text: c, options: { fontSize: chipPt, bold: true } }], { x: X + i * (cw + gap), y, w: cw, h: 1.1, align: "center", valign: "middle", rotate: [-2, 1, -1, 2][i % 4], r: 0.25 }));
     });
     if (o.badge) {
       t.click(o.badge);
