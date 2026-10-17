@@ -11,7 +11,7 @@ Everything is in this folder (`$SKILL` below):
 
 - `engine/kit.js`: the `Deck` class and its slide types. Each slide type places its own elements, measures its text (Arial metrics), numbers its own clicks and writes the speaker notes.
 - `engine/animate.js`: writes PowerPoint click sequences into the .pptx (pptxgenjs can't).
-- `reference/slides.md`: every slide type, what it's for, its fields and its clicks. **Read it before planning.**
+- `reference/slides.md`: every slide type (text, picture galleries, nested circles, colour-coded prompts), what it is for, its fields and its clicks. **Read it before planning.**
 - `scripts/check.py`: fails if any element on any slide isn't animated, or if an animation targets nothing.
 - `scripts/render.sh`: renders every slide (fully built) into one grid image.
 - `examples/win-win/`: an 11-slide, 43-click talk built with every slide type but `points` and `statement`. Use it as the quality bar.

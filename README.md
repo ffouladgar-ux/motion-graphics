@@ -85,7 +85,7 @@ A finished example is in `samples/one-sentence/`.
 /click-deck
 ```
 
-Give it an outline, a script or a video to turn into a talk. It plans one slide per idea and waits for your OK. Then it writes a short `deck.js` from twelve slide types (cover, stat, cards, question, checklist, steps, mystery, pair, contrast, points, statement, close). The kit measures every text so nothing overflows, and `check.py` confirms every element on every slide is animated.
+Give it an outline, a script or a video to turn into a talk. It plans one slide per idea and waits for your OK. Then it writes a short `deck.js` from seventeen slide types (including picture galleries, nested circles and colour-coded prompts). The kit measures every text so nothing overflows, and `check.py` confirms every element on every slide is animated.
 
 A finished 11-slide, 43-click example is in `skills/click-deck/examples/win-win/`.
 

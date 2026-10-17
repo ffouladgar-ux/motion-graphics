@@ -101,3 +101,42 @@ deck.close({ bg: "teal", title: "Name the transformation *they are buying.*", le
   chips: ["every page", "every price", "every word"], badge: "WIN-WIN" });
 ```
 Clicks: lead, 1 per chip (max 4), badge.
+
+## Slides with pictures and colour-coded prompts
+
+Image paths are relative to `deck.js`; PNG and JPEG only. Pictures are fitted inside their box without cropping.
+
+### gallery — 2–4 picture cards, one per click
+Timelines, everyday uses, AI vision, case studies, tool logos. An item without `image` shows its `kicker` large (e.g. a year).
+```js
+deck.gallery({ bg: "purple", title: "From an idea to a *field*",
+  items: [{ image: "img/turing.png", kicker: "1950", label: "Alan Turing", note: "\"Can machines think?\"" }, ...],
+  footer: "…", stress: 3 });
+```
+Clicks: 1 per item, +1 footer. Labels shrink automatically until label and note fit.
+
+### picture — one large image
+With an optional `caption` pill and up to 4 `points` beside it (each on a click).
+```js
+deck.picture({ bg: "amber", title: "Inspired by the *brain*", image: "img/neuron.png", caption: "Biological vs artificial neuron" });
+```
+
+### nested — technologies inside each other
+Concentric circles from outermost to innermost (max 4), each with an example card, one per click.
+```js
+deck.nested({ bg: "blue", title: "Technologies *inside each other*",
+  rings: [{ label: "Artificial intelligence", example: "A classic chatbot: rules written by people" }, ...] });
+```
+
+### decompose — a prompt piece by piece
+Each part (max 6) gets a coloured tag and a tinted row, one per click.
+```js
+const PROMPT = [{ tag: "Role", text: "You are an expert in marketing…", color: "FFE066" }, ...];
+deck.decompose({ bg: "teal", title: "A good prompt, *piece by piece*", parts: PROMPT });
+```
+
+### colorText — the same prompt, assembled
+The whole prompt with each part highlighted in its colour, then the legend chips one per click. Pair it with `decompose` using the same `parts`.
+```js
+deck.colorText({ bg: "blue", title: "The same prompt, *assembled*", parts: PROMPT });
+```

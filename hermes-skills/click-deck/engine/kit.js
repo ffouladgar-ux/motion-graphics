@@ -94,6 +94,37 @@ const rich = (text, color, hi = COL.yellow, extra = {}) => {
 };
 const shadow = () => ({ type: "outer", blur: 14, offset: 5, angle: 90, color: "000000", opacity: 0.28 });
 
+// Pixel size of a PNG or JPEG, read from its header (no dependencies, synchronous).
+function imageSize(file) {
+  const b = fs.readFileSync(file);
+  if (b.readUInt32BE(0) === 0x89504e47) return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) };
+  if (b[0] === 0xff && b[1] === 0xd8) {
+    let i = 2;
+    while (i < b.length) {
+      const marker = b[i + 1];
+      const len = b.readUInt16BE(i + 2);
+      if ([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf].includes(marker))
+        return { h: b.readUInt16BE(i + 5), w: b.readUInt16BE(i + 7) };
+      i += 2 + len;
+    }
+  }
+  throw new Error(`${file}: only PNG and JPEG images are supported`);
+}
+// Largest box with the image's proportions that fits inside (x, y, w, h), centred.
+function contain(file, x, y, w, h) {
+  const { w: iw, h: ih } = imageSize(file);
+  const s = Math.min(w / iw, h / ih);
+  const cw = iw * s;
+  const ch = ih * s;
+  return { x: x + (w - cw) / 2, y: y + (h - ch) / 2, w: cw, h: ch };
+}
+// Light tint of a hex colour, for highlight backgrounds.
+const tint = (hex, k = 0.75) =>
+  [0, 2, 4]
+    .map((i) => Math.round(parseInt(hex.slice(i, i + 2), 16) + (255 - parseInt(hex.slice(i, i + 2), 16)) * k).toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+
 class Deck {
   constructor({ title = "Presentation", out = "deck.pptx", author } = {}) {
     this.out = out;
@@ -251,6 +282,12 @@ class Deck {
           margin: [18, 22, 18, 22], // pptxgenjs order: left, right, bottom, top
           ...rest,
         });
+        return name;
+      },
+      image(file, x, y, w, h) {
+        const name = ctx.name("Image");
+        if (!fs.existsSync(file)) throw new Error(`slide ${no}: image not found: ${file}`);
+        s.addImage({ path: file, objectName: name, ...contain(file, x, y, w, h) });
         return name;
       },
       badge(symbol, x, y, color, size = 0.75) {
@@ -732,6 +769,141 @@ const TYPES = {
     }
     t.done();
   },
+};
+
+/** 2–4 cards with a picture each (history, uses, case studies), one per click.
+ *  items: [{ image?, kicker?, label, note? }] — an item without image shows its kicker large. */
+TYPES.gallery = function (o) {
+  const t = this._slide(o.bg ?? "blue", o);
+  t.title(o.title);
+  const n = o.items.length;
+  if (n < 2 || n > 4) t.warn("gallery works best with 2–4 items");
+  const gap = 0.35;
+  const cw = (CONTENT_W - gap * (n - 1)) / n;
+  const top = t.top + 0.1;
+  const cardH = 6.95 - top - (o.footer ? 0.7 : 0);
+  const imgH = cardH - 1.45;
+  const textH = 1.25;
+  const fitsAt = (p) =>
+    o.items.every((it) => {
+      if (!plain(it.label).split(/\s+/).every((w) => textWidth(w, p) <= cw - 0.4)) return false;
+      const kick = it.image && it.kicker ? 0.25 : 0;
+      const lab = (lineCount(it.label, p, cw - 0.4) * p * 1.2) / 72;
+      const note = it.note ? (lineCount(it.note, 16, cw - 0.4, "regular") * 16 * 1.2) / 72 : 0;
+      return kick + lab + note <= textH;
+    });
+  const labelPt = [26, 22, 20, 18, 16].find(fitsAt) ?? 16;
+  const names = o.items.map((it, i) => {
+    t.click([it.kicker, it.label, it.note].filter(Boolean).join(" "));
+    const x = X + i * (cw + gap);
+    const card = t.name("Card");
+    t.s.addShape(this.pres.shapes.ROUNDED_RECTANGLE, { objectName: card, x, y: top, w: cw, h: cardH, rectRadius: 0.22, fill: { color: COL.paper }, shadow: shadow() });
+    t.anim(card);
+    if (it.image) {
+      t.anim(t.image(it.image, x + 0.15, top + 0.15, cw - 0.3, imgH - 0.1), "pop", 120);
+    } else if (it.kicker) {
+      t.anim(t.text(it.kicker, { x: x + 0.15, y: top + 0.15, w: cw - 0.3, h: imgH - 0.1, fontSize: 60, color: COL.ink, align: "center", valign: "middle" }), "pop", 120);
+    }
+    const runs = [
+      ...(it.image && it.kicker ? [{ text: it.kicker, options: { fontFace: MONO, fontSize: 13, color: COL.muted, charSpacing: 3, breakLine: true } }] : []),
+      { text: it.label, options: { fontSize: labelPt, bold: true, color: COL.ink, breakLine: !!it.note } },
+      ...(it.note ? [{ text: it.note, options: { fontSize: 16, color: COL.muted } }] : []),
+    ];
+    t.fit(it.label, labelPt, cw - 0.4, 0.9);
+    t.anim(t.text(runs, { x: x + 0.2, y: top + imgH + 0.1, w: cw - 0.4, h: cardH - imgH - 0.2, valign: "top" }), "fade", 250);
+    return card;
+  });
+  if (o.footer) {
+    t.click(o.footer);
+    t.anim(t.tag(o.footer, top + cardH + 0.22, { bg: COL.yellow, color: COL.ink }));
+    if (o.stress != null) t.anim(names[o.stress], "pulse", 450);
+  }
+  t.done();
+};
+
+/** One large picture, with an optional caption and up to 4 points beside it, each on a click. */
+TYPES.picture = function (o) {
+  const t = this._slide(o.bg ?? "teal", o);
+  t.title(o.title);
+  const top = t.top + 0.05;
+  const pts = o.points ?? [];
+  const boxW = pts.length ? 6.3 : CONTENT_W;
+  const boxH = 6.85 - top - (o.caption ? 0.6 : 0);
+  t.click(o.say ?? "picture");
+  const panel = t.name("Panel");
+  const box = contain(o.image, X + 0.15, top + 0.15, boxW - 0.3, boxH - 0.3);
+  t.s.addShape(this.pres.shapes.ROUNDED_RECTANGLE, { objectName: panel, x: box.x - 0.15, y: box.y - 0.15, w: box.w + 0.3, h: box.h + 0.3, rectRadius: 0.2, fill: { color: COL.white }, shadow: shadow() });
+  t.anim(panel);
+  t.anim(t.image(o.image, box.x, box.y, box.w, box.h), "pop", 120);
+  if (o.caption) {
+    t.click(o.caption);
+    t.anim(t.tag(o.caption, box.y + box.h + 0.35, { x: box.x - 0.15, bg: COL.yellow, color: COL.ink }));
+  }
+  pts.forEach((p, i) => {
+    t.click(p);
+    t.fit(p, 26, CONTENT_W - boxW - 0.6, 1.2);
+    t.anim(t.card([{ text: p, options: { fontSize: 24, bold: true } }], { x: X + boxW + 0.3, y: top + i * 1.15, w: CONTENT_W - boxW - 0.3, h: 0.95, valign: "middle", r: 0.2 }));
+  });
+  t.done();
+};
+
+/** Technologies nested inside each other: concentric circles, one per click, each with an example card.
+ *  rings: [{ label, example }] from outermost to innermost (max 4). */
+TYPES.nested = function (o) {
+  const t = this._slide(o.bg ?? "blue", o);
+  t.title(o.title);
+  const top = t.top;
+  const D = Math.min(4.6, 6.95 - top);
+  const fills = ["FFFFFF", "FFE7A3", "FFC93C", "FF8A3D"];
+  o.rings.forEach((r, i) => {
+    t.click(`${r.label}: ${r.example}`);
+    const d = D * (1 - i * 0.19);
+    const cx = X + D / 2;
+    const cy = top + D / 2 + (D - d) * 0.42;
+    const ring = t.name("Ring");
+    t.s.addShape(this.pres.shapes.OVAL, {
+      objectName: ring, x: cx - d / 2, y: cy - d / 2, w: d, h: d,
+      fill: { color: fills[i % 4] }, line: { color: COL.ink, width: 1 },
+    });
+    t.anim(ring);
+    const label = t.text(r.label, { x: cx - d * 0.4, y: cy - d / 2 + 0.1, w: d * 0.8, h: 0.32, fontSize: 14, color: COL.ink, align: "center", valign: "middle" });
+    t.anim(label, "fade", 150);
+    t.anim(t.card([{ text: r.label.toUpperCase(), options: { fontFace: MONO, fontSize: 12, color: COL.muted, charSpacing: 2, breakLine: true } }, { text: r.example, options: { fontSize: 20, bold: true } }], { x: X + D + 0.6, y: top + i * 1.12, w: CONTENT_W - D - 0.6, h: 0.95, valign: "middle", r: 0.2, margin: [18, 18, 4, 4] }), "pop", 200);
+  });
+  t.done();
+};
+
+/** A prompt broken into its parts, one per click. parts: [{ tag, text, color }] (max 6). */
+TYPES.decompose = function (o) {
+  const t = this._slide(o.bg ?? "purple", o);
+  t.title(o.title);
+  const n = o.parts.length;
+  const rowH = Math.min(0.8, (6.95 - t.top) / n - 0.12);
+  o.parts.forEach((p, i) => {
+    t.click(`${p.tag}: ${p.text}`);
+    const y = t.top + i * (rowH + 0.12);
+    t.fit(p.text, 18, CONTENT_W - 2.7, rowH);
+    t.anim(t.card([{ text: p.tag, options: { fontSize: 18, bold: true, color: COL.ink } }], { x: X, y, w: 2.3, h: rowH, fill: p.color, align: "center", valign: "middle", r: 0.18, margin: 0 }));
+    t.anim(t.card([{ text: p.text, options: { fontSize: 18 } }], { x: X + 2.45, y, w: CONTENT_W - 2.45, h: rowH, fill: tint(p.color, 0.7), valign: "middle", r: 0.18, margin: [18, 18, 4, 4] }), "wipe", 150);
+  });
+  t.done();
+};
+
+/** The whole prompt with each part highlighted in its colour, then the legend chips one per click. */
+TYPES.colorText = function (o) {
+  const t = this._slide(o.bg ?? "teal", o);
+  t.title(o.title);
+  const top = t.top;
+  t.click("the full prompt");
+  const runs = o.parts.map((p, i) => ({ text: p.text + (i < o.parts.length - 1 ? " " : ""), options: { fontSize: 20, bold: true, color: COL.ink, highlight: p.color } }));
+  t.fit(o.parts.map((p) => p.text).join(" "), 20, CONTENT_W - 0.8, 3.6);
+  t.anim(t.card(runs, { x: X, y: top, w: CONTENT_W, h: 3.7, valign: "middle", margin: [30, 30, 20, 20] }));
+  const cw = (CONTENT_W - 0.2 * (o.parts.length - 1)) / o.parts.length;
+  o.parts.forEach((p, i) => {
+    t.click(p.tag);
+    t.anim(t.card([{ text: p.tag, options: { fontSize: 15, bold: true, color: COL.ink } }], { x: X + i * (cw + 0.2), y: top + 3.95, w: cw, h: 0.6, fill: p.color, align: "center", valign: "middle", r: 0.3, margin: 0 }));
+  });
+  t.done();
 };
 
 for (const [type, fn] of Object.entries(TYPES)) {
