@@ -684,30 +684,44 @@ const TYPES = {
     const t = this._slide(o.bg ?? "teal", o);
     t.title(o.title);
     const n = o.items.length;
-    if (n > 5) t.warn("points fits up to 5 items; split the slide");
+    if (n > 8) t.warn("points fits up to 8 items; split the slide");
+    // Up to 5 items: big rows with the note under the label. 6–8: compact rows, note on the same line.
+    const compact = n > 5;
+    const gap = compact ? 0.1 : 0.18;
     const avail = 6.95 - t.top;
-    const rowH = Math.min(1.05, avail / n - 0.18);
+    const rowH = Math.min(1.05, avail / n - gap);
+    const pt = compact ? (rowH < 0.5 ? 18 : 20) : 26;
     o.items.forEach((it, i) => {
       const item = typeof it === "string" ? { label: it } : it;
       t.click([item.label, item.note].filter(Boolean).join(" — "));
-      const y = t.top + i * (rowH + 0.18);
-      const labelLines = t.fit(item.label, 26, 9.8, rowH);
-      if (item.note) {
-        const noteLines = lineCount(item.note, 16, 9.8, "regular");
-        if ((labelLines * 26 + noteLines * 16) * 1.2 / 72 > rowH + 0.05)
-          t.warn(`"${plain(item.label).slice(0, 40)}" plus its note may overflow its row; shorten one of them`);
+      const y = t.top + i * (rowH + gap);
+      const link = item.url ? { hyperlink: { url: item.url, tooltip: item.url } } : {};
+      let runs;
+      if (compact) {
+        const line = item.note ? `${item.label}  ${item.note}` : item.label;
+        if (lineCount(line, pt, CONTENT_W - 1.6) > 1) t.warn(`"${plain(item.label).slice(0, 40)}" and its note need two lines in a compact list; shorten one of them`);
+        runs = [
+          { text: item.label, options: { fontSize: pt, bold: true } },
+          ...(item.note ? [{ text: `  ${item.note}`, options: { fontSize: pt - 4, bold: false, color: COL.muted, ...link } }] : []),
+        ];
+      } else {
+        const labelLines = t.fit(item.label, pt, 9.8, rowH);
+        if (item.note) {
+          const noteLines = lineCount(item.note, 16, 9.8, "regular");
+          if ((labelLines * pt + noteLines * 16) * 1.2 / 72 > rowH + 0.05)
+            t.warn(`"${plain(item.label).slice(0, 40)}" plus its note may overflow its row; shorten one of them`);
+        }
+        runs = [
+          { text: item.label, options: { fontSize: pt, bold: true, breakLine: !!item.note } },
+          ...(item.note ? [{ text: item.note, options: { fontSize: 16, color: COL.muted, ...link } }] : []),
+        ];
       }
-      const row = t.card(
-        [
-          { text: item.label, options: { fontSize: 26, bold: true, breakLine: !!item.note } },
-          ...(item.note ? [{ text: item.note, options: { fontSize: 16, color: COL.muted } }] : []),
-        ],
-        { x: X + 1.25, y, w: CONTENT_W - 1.25, h: rowH, valign: "middle", r: 0.2, margin: [28, 22, 6, 6] },
-      );
-      const num = t.card([{ text: String(i + 1).padStart(2, "0"), options: { fontSize: 30, bold: true } }], {
+      const numW = compact ? 0.8 : 1.05;
+      const row = t.card(runs, { x: X + numW + 0.2, y, w: CONTENT_W - numW - 0.2, h: rowH, valign: "middle", r: 0.2, margin: [28, 22, 4, 4] });
+      const num = t.card([{ text: String(i + 1).padStart(2, "0"), options: { fontSize: compact ? 22 : 30, bold: true } }], {
         x: X,
         y,
-        w: 1.05,
+        w: numW,
         h: rowH,
         fill: COL.yellow,
         align: "center",
@@ -777,7 +791,7 @@ TYPES.gallery = function (o) {
   const t = this._slide(o.bg ?? "blue", o);
   t.title(o.title);
   const n = o.items.length;
-  if (n < 2 || n > 4) t.warn("gallery works best with 2–4 items");
+  if (n < 2 || n > 5) t.warn("gallery works best with 2–5 items");
   const gap = 0.35;
   const cw = (CONTENT_W - gap * (n - 1)) / n;
   const top = t.top + 0.1;
@@ -813,6 +827,17 @@ TYPES.gallery = function (o) {
     t.anim(t.text(runs, { x: x + 0.2, y: top + imgH + 0.1, w: cw - 0.4, h: cardH - imgH - 0.2, valign: "top" }), "fade", 250);
     return card;
   });
+  // Answers (item.answer) land together on one click, after every card is up: ask first, reveal later.
+  if (o.items.some((it) => it.answer)) {
+    t.click(o.reveal ?? `answers: ${o.items.map((it) => it.answer).filter(Boolean).join(", ")}`);
+    o.items.forEach((it, i) => {
+      if (!it.answer) return;
+      const x = X + i * (cw + gap);
+      const pt = [22, 20, 18, 16, 14].find((p) => textWidth(it.answer, p) <= cw - 0.6) ?? 14;
+      const pill = t.card([{ text: it.answer, options: { fontSize: pt, bold: true, color: COL.ink } }], { x: x + 0.2, y: top + imgH - 0.55, w: cw - 0.4, h: 0.6, fill: it.answerColor ?? COL.yellow, align: "center", valign: "middle", r: 0.3, margin: 0, rotate: [-2, 2][i % 2] });
+      t.anim(pill, "pop", i * 150);
+    });
+  }
   if (o.footer) {
     t.click(o.footer);
     t.anim(t.tag(o.footer, top + cardH + 0.22, { bg: COL.yellow, color: COL.ink }));
@@ -902,6 +927,271 @@ TYPES.colorText = function (o) {
   o.parts.forEach((p, i) => {
     t.click(p.tag);
     t.anim(t.card([{ text: p.tag, options: { fontSize: 15, bold: true, color: COL.ink } }], { x: X + i * (cw + 0.2), y: top + 3.95, w: cw, h: 0.6, fill: p.color, align: "center", valign: "middle", r: 0.3, margin: 0 }));
+  });
+  t.done();
+};
+
+// Pastel highlight colours for token rows (like the OpenAI tokenizer).
+const TOKEN_COLORS = ["CDB8F5", "C4EBC1", "F9DDAE", "F4B2B2", "AFD8F2", "F7C6E4", "D9E7A8"];
+// White text on these header colours, dark text otherwise.
+const isDark = (hex) => {
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return 0.299 * r + 0.587 * g + 0.114 * b < 150;
+};
+
+/** Up to 4 columns: each header (title + sub) lands on a click, then each of its items on its own click.
+ *  columns: [{ title, sub, color, items: ["…"] }] */
+TYPES.columns = function (o) {
+  const t = this._slide(o.bg ?? "blue", o);
+  t.title(o.title);
+  const n = o.columns.length;
+  if (n > 4) t.warn("columns fits up to 4 columns");
+  const gap = 0.25;
+  const cw = (CONTENT_W - gap * (n - 1)) / n;
+  const top = t.top - 0.1;
+  const headH = o.columns.some((c) => c.sub) ? 1.0 : 0.7;
+  const itemTop = top + headH + 0.15;
+  const avail = 6.98 - itemTop;
+  const iw = cw - 0.3;
+  const itemGap = 0.07;
+  const heightAt = (c, p) => c.items.reduce((h, it) => h + lineCount(it, p, iw, "regular") * p * 1.22 / 72 + 0.14 + itemGap, 0);
+  const pt = [20, 18, 17, 16, 15, 14, 13, 12].find((p) => o.columns.every((c) => heightAt(c, p) <= avail)) ?? 12;
+  if (o.columns.some((c) => heightAt(c, pt) > avail)) t.warn("columns: items overflow; shorten them or split the slide");
+  o.columns.forEach((c, i) => {
+    const x = X + i * (cw + gap);
+    const ink = isDark(c.color) ? COL.white : COL.ink;
+    t.click(c.sub ? `${c.title} (${c.sub})` : c.title);
+    const titlePt = [24, 22, 20, 18].find((p) => textWidth(c.title, p) <= cw - 0.3) ?? 18;
+    const runs = [
+      { text: c.title, options: { fontSize: titlePt, bold: true, color: ink, breakLine: !!c.sub } },
+      ...(c.sub ? [{ text: c.sub, options: { fontSize: 15, color: ink } }] : []),
+    ];
+    t.anim(t.card(runs, { x, y: top, w: cw, h: headH, fill: c.color, align: "center", valign: "middle", r: 0.2, margin: [8, 8, 4, 4] }));
+    let y = itemTop;
+    c.items.forEach((it) => {
+      t.click(it);
+      const h = lineCount(it, pt, iw, "regular") * pt * 1.22 / 72 + 0.14;
+      t.anim(t.card([{ text: it, options: { fontSize: pt, bold: false, color: COL.ink } }], { x, y, w: cw, h, fill: tint(c.color, 0.82), valign: "middle", r: 0.12, margin: [10, 8, 2, 2], shadow: undefined }), "rise");
+      y += h + itemGap;
+    });
+  });
+  t.done();
+};
+
+/** A grid of small cards (up to 12): a number or picture plus a label. `by`: "item" (default),
+ *  "row" or "all" decides how many land per click. Items with `answer` get it revealed on one last click. */
+TYPES.grid = function (o) {
+  const t = this._slide(o.bg ?? "teal", o);
+  t.title(o.title);
+  const n = o.items.length;
+  const cols = o.cols ?? Math.min(4, n);
+  const rows = Math.ceil(n / cols);
+  const gap = 0.22;
+  const top = t.top - 0.05;
+  const bottom = 6.95 - (o.footer ? 0.7 : 0);
+  const cw = (CONTENT_W - gap * (cols - 1)) / cols;
+  const ch = (bottom - top - gap * (rows - 1)) / rows;
+  const withImg = o.items.some((it) => it.image);
+  const by = o.by ?? "item";
+  const labelPt = [20, 18, 16, 15, 14].find((p) => o.items.every((it) => lineCount(it.label, p, withImg ? cw - 0.3 : cw - 1.0) <= (withImg ? 1 : 2))) ?? 14;
+  const pos = [];
+  o.items.forEach((it, i) => {
+    const r = Math.floor(i / cols);
+    const c = i % cols;
+    const x = X + c * (cw + gap);
+    const y = top + r * (ch + gap);
+    pos.push({ x, y });
+    const first = by === "item" || (by === "row" && c === 0) || (by === "all" && i === 0);
+    if (first) t.click(by === "item" ? it.label : by === "row" ? o.items.slice(i, i + cols).map((x) => x.label).join(", ") : "all items");
+    const delay = by === "item" ? 0 : (by === "row" ? c : i) * 120;
+    if (withImg) {
+      const card = t.name("Card");
+      t.s.addShape(this.pres.shapes.ROUNDED_RECTANGLE, { objectName: card, x, y, w: cw, h: ch, rectRadius: 0.18, fill: { color: COL.paper }, shadow: shadow() });
+      t.anim(card, "pop", delay);
+      const labH = (it.note ? 0.62 : 0.42);
+      if (it.image) t.anim(t.image(it.image, x + 0.1, y + 0.1, cw - 0.2, ch - labH - 0.2), "pop", delay + 80);
+      const runs = [
+        { text: it.label, options: { fontSize: labelPt, bold: true, color: COL.ink, breakLine: !!it.note } },
+        ...(it.note ? [{ text: it.note, options: { fontSize: 12, color: COL.muted } }] : []),
+      ];
+      t.anim(t.text(runs, { x: x + 0.12, y: y + ch - labH - 0.08, w: cw - 0.24, h: labH, align: "center", valign: "middle" }), "fade", delay + 150);
+    } else {
+      const card = t.card([{ text: it.label, options: { fontSize: labelPt, bold: true, color: COL.ink, breakLine: !!it.note } }, ...(it.note ? [{ text: it.note, options: { fontSize: 13, color: COL.muted } }] : [])], { x, y, w: cw, h: ch, valign: "middle", r: 0.18, margin: [70, 12, 4, 4] });
+      const num = t.badge(it.badge ?? String(i + 1), x + 0.15, y + (ch - 0.58) / 2, it.color ?? COL.ink, 0.58);
+      t.anim(card, "pop", delay);
+      t.anim(num, "pop", delay + 120);
+    }
+  });
+  if (o.items.some((it) => it.answer)) {
+    t.click(o.reveal ?? "answers");
+    o.items.forEach((it, i) => {
+      if (!it.answer) return;
+      const w = Math.min(cw * 0.62, textWidth(it.answer, 14) + 0.45);
+      const pill = t.card([{ text: it.answer, options: { fontSize: 14, bold: true, color: COL.ink } }], { x: pos[i].x + cw - w - 0.08, y: pos[i].y - 0.14, w, h: 0.4, fill: it.answerColor ?? COL.yellow, align: "center", valign: "middle", r: 0.2, margin: 0, rotate: 3 });
+      t.anim(pill, "pop", i * 90);
+    });
+  }
+  if (o.footer) {
+    t.click(o.footer);
+    t.anim(t.tag(o.footer, bottom + 0.22, { bg: COL.yellow, color: COL.ink }));
+  }
+  t.done();
+};
+
+/** Quote cards (up to 6, in a 3×2 grid), one per click: logo, the quote, who said it and when. */
+TYPES.quotes = function (o) {
+  const t = this._slide(o.bg ?? "purple", o);
+  t.title(o.title);
+  const n = o.items.length;
+  const cols = n <= 4 ? 2 : 3;
+  const rows = Math.ceil(n / cols);
+  const gap = 0.25;
+  const top = t.top - 0.1;
+  const cw = (CONTENT_W - gap * (cols - 1)) / cols;
+  const ch = (6.98 - top - gap * (rows - 1)) / rows;
+  const qw = cw - 0.5;
+  const qh = ch - 1.05;
+  const qPt = [20, 18, 17, 16, 15, 14].find((p) => o.items.every((q) => lineCount(q.quote, p, qw) * p * 1.2 / 72 <= qh)) ?? 14;
+  o.items.forEach((q, i) => {
+    const x = X + (i % cols) * (cw + gap);
+    const y = top + Math.floor(i / cols) * (ch + gap);
+    t.click(`${q.who}: ${q.quote}`);
+    const card = t.card([{ text: q.quote, options: { fontSize: qPt, bold: true, color: COL.ink } }], { x, y, w: cw, h: ch, valign: "middle", r: 0.2, margin: [24, 24, 50, 10] });
+    t.anim(card);
+    if (q.logo) t.anim(t.image(q.logo, x + 0.22, y + ch - 0.62, 0.45, 0.45), "pop", 150);
+    t.anim(t.text([{ text: q.who, options: { fontSize: 14, bold: true, color: COL.ink, breakLine: true } }, { text: q.role, options: { fontSize: 11, bold: false, color: COL.muted } }], { x: x + (q.logo ? 0.8 : 0.25), y: y + ch - 0.7, w: cw - 1.0, h: 0.6, valign: "middle" }), "fade", 250);
+    if (q.mark) t.anim(t.badge(q.mark, x + cw - 0.45, y - 0.18, q.markColor ?? COL.ink, 0.55), "pop", 300);
+  });
+  t.done();
+};
+
+/** A wall of logos on white tiles. A row lands per click, its tiles one after another.
+ *  items: [{ image }] or [{ text }] for a brand with no picture. */
+TYPES.logos = function (o) {
+  const t = this._slide(o.bg ?? "blue", o);
+  t.title(o.title);
+  const n = o.items.length;
+  const cols = o.cols ?? Math.min(4, n);
+  const rows = Math.ceil(n / cols);
+  const gap = 0.25;
+  const top = t.top - 0.05;
+  const bottom = 6.95 - (o.footer ? 0.7 : 0);
+  const cw = (CONTENT_W - gap * (cols - 1)) / cols;
+  const ch = Math.min(1.5, (bottom - top - gap * (rows - 1)) / rows);
+  o.items.forEach((it, i) => {
+    const c = i % cols;
+    const x = X + c * (cw + gap);
+    const y = top + Math.floor(i / cols) * (ch + gap);
+    if (c === 0) t.click(o.items.slice(i, i + cols).map((x) => x.name ?? x.text ?? "logo").join(", "));
+    const tile = t.name("Tile");
+    t.s.addShape(this.pres.shapes.ROUNDED_RECTANGLE, { objectName: tile, x, y, w: cw, h: ch, rectRadius: 0.16, fill: { color: COL.white }, shadow: shadow() });
+    t.anim(tile, "pop", c * 140);
+    if (it.image) t.anim(t.image(it.image, x + 0.3, y + 0.2, cw - 0.6, ch - 0.4), "pop", c * 140 + 80);
+    else {
+      const pt = [26, 22, 20, 18].find((p) => lineCount(it.text, p, cw - 0.4) <= 2) ?? 18;
+      t.anim(t.text(it.text, { x: x + 0.2, y, w: cw - 0.4, h: ch, fontSize: pt, color: it.color ?? COL.ink, align: "center", valign: "middle" }), "pop", c * 140 + 80);
+    }
+  });
+  if (o.footer) {
+    t.click(o.footer);
+    t.anim(t.tag(o.footer, Math.min(6.4, top + rows * (ch + gap) + 0.05), { bg: COL.yellow, color: COL.ink }));
+  }
+  t.done();
+};
+
+/** Who I am: a dark ID card (name, role, lines), stat tiles (one per click), then a wide card (e.g. diplomas). */
+TYPES.profile = function (o) {
+  const t = this._slide(o.bg ?? "teal", o);
+  t.title(o.title);
+  const top = t.top - 0.05;
+  const leftW = 4.5;
+  t.click(o.name);
+  const idRuns = [
+    { text: o.name, options: { fontSize: 32, bold: true, color: COL.yellow, breakLine: true } },
+    { text: o.role, options: { fontSize: 17, bold: true, color: COL.white, breakLine: true } },
+    ...(o.lines ?? []).map((l, i, a) => ({ text: l, options: { fontSize: 16, bold: false, color: COL.faint, paraSpaceBefore: 10, breakLine: i < a.length - 1 } })),
+  ];
+  t.fit(o.role, 17, leftW - 0.6, 1.4);
+  t.anim(t.card(idRuns, { x: X, y: top, w: leftW, h: 6.95 - top, fill: COL.ink, valign: "top", margin: [24, 24, 22, 26] }));
+  const rx = X + leftW + 0.3;
+  const rw = CONTENT_W - leftW - 0.3;
+  const facts = o.facts ?? [];
+  const tw = (rw - 0.25) / 2;
+  const th = 1.3;
+  facts.slice(0, 4).forEach((f, i) => {
+    t.click(`${f.big} ${f.small}`);
+    const x = rx + (i % 2) * (tw + 0.25);
+    const y = top + Math.floor(i / 2) * (th + 0.22);
+    t.fit(f.small, 15, tw - 0.5, 0.5, "regular");
+    t.anim(t.card([{ text: f.big, options: { fontSize: 40, bold: true, breakLine: true } }, { text: f.small, options: { fontSize: 15, color: COL.muted } }], { x, y, w: tw, h: th, valign: "middle", r: 0.2, margin: [22, 14, 6, 6] }));
+  });
+  if (o.wide) {
+    t.click(o.wide.label);
+    const y = top + 2 * (th + 0.22);
+    const h = 6.95 - y;
+    t.anim(t.card([{ text: o.wide.label.toUpperCase(), options: { fontFace: MONO, fontSize: 12, color: COL.muted, charSpacing: 2, breakLine: true } }, ...o.wide.lines.map((l, i, a) => ({ text: l, options: { fontSize: 16, bold: true, breakLine: i < a.length - 1 } }))], { x: rx, y, w: rw, h, fill: COL.yellow, valign: "middle", r: 0.2, margin: [22, 18, 8, 8] }));
+  }
+  t.done();
+};
+
+/** Text split into tokens, one tokenizer panel per click (coloured like the OpenAI tokenizer), then a link.
+ *  rows: [{ label, tokens: ["ici", " c", "'est", " Marseille"] }], link: { text, url } */
+TYPES.tokens = function (o) {
+  const t = this._slide(o.bg ?? "teal", o);
+  t.title(o.title);
+  const top = t.top - 0.05;
+  const n = o.rows.length;
+  const bottom = 6.95 - (o.link ? 0.75 : 0);
+  const rowH = Math.min(1.45, (bottom - top - 0.18 * (n - 1)) / n);
+  o.rows.forEach((r, i) => {
+    const text = r.tokens.join("");
+    t.click(`${r.label ?? text}: ${r.tokens.length} tokens, ${text.length} characters`);
+    const y = top + i * (rowH + 0.18);
+    const pt = [30, 26, 22, 20].find((p) => textWidth(text, p, "mono") <= CONTENT_W - 4.4) ?? 20;
+    const runs = r.tokens.map((tok, k) => ({ text: tok.replace(/ /g, " "), options: { fontFace: MONO, fontSize: pt, bold: false, color: COL.ink, highlight: TOKEN_COLORS[k % TOKEN_COLORS.length] } }));
+    t.anim(t.card(runs, { x: X + 3.6, y, w: CONTENT_W - 3.6, h: rowH, valign: "middle", r: 0.18, margin: [26, 18, 4, 4] }));
+    const meta = [
+      ...(r.label ? [{ text: r.label.toUpperCase(), options: { fontFace: MONO, fontSize: 12, color: COL.muted, charSpacing: 2, breakLine: true } }] : []),
+      { text: `${r.tokens.length}`, options: { fontSize: 34, bold: true, color: COL.ink } },
+      { text: " tokens   ", options: { fontSize: 15, color: COL.muted } },
+      { text: `${text.length}`, options: { fontSize: 34, bold: true, color: COL.ink } },
+      { text: " chars", options: { fontSize: 15, color: COL.muted } },
+    ];
+    t.anim(t.card(meta, { x: X, y, w: 3.4, h: rowH, fill: COL.yellow, valign: "middle", r: 0.18, margin: [20, 10, 4, 4] }), "pop", 150);
+  });
+  if (o.link) {
+    t.click(`link: ${o.link.url}`);
+    const w = Math.min(CONTENT_W, textWidth(o.link.text, 18) + 0.8);
+    t.anim(t.card([{ text: o.link.text, options: { fontSize: 18, bold: true, color: "1D4ED8", underline: { style: "sng" }, hyperlink: { url: o.link.url, tooltip: o.link.url } } }], { x: X, y: bottom + 0.15, w, h: 0.55, align: "center", valign: "middle", r: 0.27, margin: 0 }));
+  }
+  t.done();
+};
+
+/** From words to numbers: the sentence, its tokens (one click), then each token's vector (one per click). */
+TYPES.vectors = function (o) {
+  const t = this._slide(o.bg ?? "blue", o);
+  t.title(o.title);
+  const top = t.top - 0.1;
+  t.click(`the sentence: ${o.sentence}`);
+  t.anim(t.card([{ text: `“${o.sentence}”`, options: { fontSize: 26, bold: true } }], { x: X, y: top, w: CONTENT_W, h: 0.8, valign: "middle", r: 0.2, margin: [24, 24, 4, 4] }));
+  t.click(`1. words become tokens: ${o.rows.map((r) => r.token).join(", ")}`);
+  const step1 = t.tag("1 · Words become tokens", top + 1.0, { bg: COL.ink });
+  t.anim(step1);
+  let x = X + 4.3;
+  o.rows.forEach((r, k) => {
+    const w = textWidth(r.token, 20) + 0.5;
+    t.anim(t.card([{ text: r.token, options: { fontSize: 20, bold: true, color: COL.ink } }], { x, y: top + 0.93, w, h: 0.56, fill: TOKEN_COLORS[k % TOKEN_COLORS.length], align: "center", valign: "middle", r: 0.15, margin: 0 }), "pop", 120 + k * 120);
+    x += w + 0.15;
+  });
+  const vTop = top + 1.75;
+  const rowH = Math.min(0.62, (6.95 - vTop - 0.5) / o.rows.length - 0.1);
+  t.click("2. tokens become vectors");
+  t.anim(t.tag("2 · Tokens become vectors (lists of numbers)", vTop, { bg: COL.ink }));
+  o.rows.forEach((r, k) => {
+    t.click(`${r.token} → ${r.vector}`);
+    const y = vTop + 0.55 + k * (rowH + 0.1);
+    t.anim(t.card([{ text: r.token, options: { fontSize: 20, bold: true, color: COL.ink } }], { x: X, y, w: 2.6, h: rowH, fill: TOKEN_COLORS[k % TOKEN_COLORS.length], align: "center", valign: "middle", r: 0.15, margin: 0 }));
+    t.anim(t.card([{ text: `→  ${r.vector}`, options: { fontFace: MONO, fontSize: 20, color: COL.ink } }], { x: X + 2.8, y, w: CONTENT_W - 2.8, h: rowH, valign: "middle", r: 0.15, margin: [20, 10, 2, 2] }), "wipe", 120);
   });
   t.done();
 };

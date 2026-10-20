@@ -85,7 +85,7 @@ Rows with a yellow number tile (01, 02…) and an optional grey note, one per cl
 deck.points({ bg: "teal", title: "How the *bootcamp* works",
   items: [{ label: "Pick one task", note: "the one you repeat every week" }, "Write the prompt", "Hand it over"] });
 ```
-Clicks: 1 per item (max 5).
+Clicks: 1 per item (max 8; 6–8 items use compact rows). Items take `url` for a clickable note.
 
 ## statement — words on their own
 Up to three lines, one per click. Use it only when nothing more active fits: a claim, a turn, a quote.
@@ -140,3 +140,40 @@ The whole prompt with each part highlighted in its colour, then the legend chips
 ```js
 deck.colorText({ bg: "blue", title: "The same prompt, *assembled*", parts: PROMPT });
 ```
+
+## More slide types (lists, people, tokens)
+
+### columns — categories, then their items one by one
+Up to 4 coloured columns. Each header lands on a click, then each of its items on its own click. Item text shrinks (20 → 12pt) until every column fits.
+```js
+deck.columns({ bg: "teal", title: "How people use *generative AI*",
+  columns: [{ title: "The Teacher", sub: "Learn", color: "7B3FBF", items: ["Explains", "Coaches"] }, ...] });
+```
+
+### grid — up to 12 small cards, with an optional answer reveal
+Numbered cards (or picture cards when items have `image`). `by`: `"item"` (one per click, default), `"row"` or `"all"`. Items with `answer` (and optional `answerColor`) get the answers on one last click: ask first, reveal later.
+```js
+deck.grid({ bg: "blue", title: "12 examples: *which circle?*", by: "row",
+  items: [{ label: "Gmail spam filter", answer: "Machine learning", answerColor: "74C0FC" }, ...] });
+```
+
+### gallery answers
+`gallery` items also take `answer`: all answers land together on one click after the cards (a quiz). Galleries now take up to 5 items.
+
+### quotes — who said what
+Up to 6 quote cards (3×2), one per click: `logo`, `quote`, `who`, `role`, and an optional corner `mark` ("+", "!", "?") with `markColor`. Use real, sourced quotes only; put the source in the notes.
+
+### logos — a wall of brands
+White tiles, a row per click (tiles pop one after another). Items: `{ image }`, or `{ text, color }` for a brand with no picture. Optional `footer`.
+
+### profile — who I am
+A dark ID card (`name`, `role`, `lines`), up to 4 stat tiles (`facts: [{ big, small }]`, one per click), then a yellow `wide` card (`{ label, lines }`, e.g. diplomas).
+
+### tokens — text cut into tokens
+One tokenizer panel per click, each token highlighted in its own colour, with the token and character counts. `rows: [{ label, tokens: ["ici", " c", "'est", " Marseille"] }]` (keep the spaces inside the tokens). Optional `link: { text, url }`, clickable in slide show. Use real tokenizer output only.
+
+### vectors — from words to numbers
+The sentence, its tokens (one click), then each token's vector (one per click). `rows: [{ token, vector: "[67, -78, …]" }]`. Say in the notes when the numbers are illustrative.
+
+### Links and long lists in points
+`points` items take `url` (the note becomes a clickable link). Lists of 6–8 items switch to compact rows with the note on the same line.
