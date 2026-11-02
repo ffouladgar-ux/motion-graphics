@@ -631,7 +631,7 @@ The earlier commit `f9c2d0f` had added `gallery`, `picture`, `nested`, `decompos
 3. **Book-to-skill and course-to-skill tools** (GitHub) for Day 3: names and links.
 4. **Voice-clone setup** for the Day 4 demo, and confirmation that VibeVoice still works.
 5. **His bots** (Strategist, offer builder, copywriter… from deck 09, slides 107–108) for Day 3: what each does, and screenshots.
-6. **ODS = Objective, Data, Skill** (confirmed). The one-line definition of each is still to approve: the drafts are in the Day 2 sessions table.
+6. ~~ODS definitions~~ **Approved (2 Nov 2026):** Objective = what you want to get, and what a good result looks like. Data = what you give the AI: examples, templates, sources. Skill = the way you reuse it every time: a master prompt, a bot or an agent.
 7. ~~Recruiting mega prompt~~ **Confirmed: the ATS CV prompt is Fadi's own** (2 Nov 2026). Keep it.
 8. **UCA logistics:**
    - group size, level and degree programme;
