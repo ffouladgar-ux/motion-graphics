@@ -25,11 +25,7 @@ Last updated: 2 November 2026.
 - **Day 1** is finished: `day1/UCA_AI_Day1.pptx` has 63 slides and 296 clicks.
 - **Days 2–5** have a detailed session plan but no slides. Section 1 has a proposed slide-by-slide outline for each; Fadi has not approved them.
 
-**Open decision: five days or six?** The plan Fadi approved has **6 days of 7 hours (42 h)**. Day 6 is a capstone (build sprints and pitches) with no lecture deck. In his latest request Fadi said "all five days". Confirm with him whether:
-- the course is now 5 days (Day 6 dropped, or merged into Day 5), or
-- Day 6 stays and only needs a short brief and an evaluation grid.
-
-Day 6 is kept at the end of section 1 until he answers.
+**Decided (2 Nov 2026): the course is now five days.** The approved plan had 6 days of 7 hours; Fadi confirmed it is now 5. Day 6 (capstone) is dropped as a separate day; the final repeat of the positioning quiz moves to the end of Day 5. How much of the capstone (if any) moves into Day 5 is still open. Day 6 stays at the end of section 1 for reference only.
 
 **Where everything is.** All paths are relative to the root of the GitHub repo `ffouladgar-ux/motion-graphics`, on branch `ccr-45c0e68b-hc56dd`:
 
@@ -630,13 +626,13 @@ The earlier commit `f9c2d0f` had added `gallery`, `picture`, `nested`, `decompos
 ## 5. What's left to do
 
 ### Decisions and inputs needed from Fadi
-1. **Five days or six?** See section 0.
-2. **Prompt generator:** "Fadi's prompt generator" for Day 2. Get it, or its link.
+1. ~~Five days or six?~~ **Five** (confirmed 2 Nov 2026). Still open: does any of the capstone (mini pitch) move into Day 5?
+2. **Prompt generator:** Fadi never supplied a file. Clarify what "his prompt generator" means: the tool on his slide 09#102 ("Générateur automatique", an image only), or his own way of generating prompts (the funnel, 09#106 "My way"). Day 1 already covers online generators and the master prompt generator.
 3. **Book-to-skill and course-to-skill tools** (GitHub) for Day 3: names and links.
 4. **Voice-clone setup** for the Day 4 demo, and confirmation that VibeVoice still works.
 5. **His bots** (Strategist, offer builder, copywriter… from deck 09, slides 107–108) for Day 3: what each does, and screenshots.
-6. **Exact ODS definitions** in his own words.
-7. **Recruiting mega prompt:** the one used is the ATS CV prompt found in his OneDrive folder `…/11 days jump emploi simplon/Devoir rendu/` ("Prompt ChatGPT _ Assistance à la rédaction de CV optimisés pour les.pdf"). That folder holds students' homework, so it may not be his own prompt. Confirm or replace.
+6. **ODS = Objective, Data, Skill** (confirmed). The one-line definition of each is still to approve: the drafts are in the Day 2 sessions table.
+7. ~~Recruiting mega prompt~~ **Confirmed: the ATS CV prompt is Fadi's own** (2 Nov 2026). Keep it.
 8. **UCA logistics:**
    - group size, level and degree programme;
    - Microsoft 365 Copilot licence and/or Google Workspace accounts;
