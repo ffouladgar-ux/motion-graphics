@@ -627,7 +627,7 @@ The earlier commit `f9c2d0f` had added `gallery`, `picture`, `nested`, `decompos
 
 ### Decisions and inputs needed from Fadi
 1. ~~Five days or six?~~ **Five** (confirmed 2 Nov 2026). Still open: does any of the capstone (mini pitch) move into Day 5?
-2. **Prompt generator:** Fadi never supplied a file. Clarify what "his prompt generator" means: the tool on his slide 09#102 ("Générateur automatique", an image only), or his own way of generating prompts (the funnel, 09#106 "My way"). Day 1 already covers online generators and the master prompt generator.
+2. ~~Prompt generator~~ **Decided (2 Nov 2026): "Fadi's prompt generator" is his own way, the funnel** (09#106 "My way"). Day 2's separate "generator" part merges into the funnel part; no external tool is needed.
 3. **Book-to-skill and course-to-skill tools** (GitHub) for Day 3: names and links.
 4. **Voice-clone setup** for the Day 4 demo, and confirmation that VibeVoice still works.
 5. **His bots** (Strategist, offer builder, copywriter… from deck 09, slides 107–108) for Day 3: what each does, and screenshots.
