@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Copy the shared parts of a Claude skill into its Hermes edition.
+"""Copy the click-deck skill into its other locations.
 
-  python3 scripts/sync_hermes.py           # copy skills/click-deck → hermes-skills/click-deck
-  python3 scripts/sync_hermes.py --check   # exit 1 if the Hermes copy is out of date
+  python3 scripts/sync_hermes.py           # copy skills/click-deck → hermes-skills/ and .claude/skills/
+  python3 scripts/sync_hermes.py --check   # exit 1 if a copy is out of date
+
+.claude/skills/click-deck is a full copy, so Claude Code loads the skill when it
+opens this repo.
 
 Only the engine, scripts and slide catalog are shared. Each edition keeps its own
 SKILL.md, because Claude and Hermes need different descriptions and tool names.
@@ -20,6 +23,8 @@ PAIRS = [
     ("skills/click-deck/scripts", "hermes-skills/click-deck/scripts"),
     ("skills/click-deck/reference/slides.md", "hermes-skills/click-deck/references/slides.md"),
     ("skills/click-deck/examples/win-win/deck.js", "hermes-skills/click-deck/templates/deck.js"),
+    # (from the Claude skill, to the copy Claude Code loads from this repo)
+    ("skills/click-deck", ".claude/skills/click-deck"),
 ]
 SKIP = {"node_modules", ".deck-assets", "package-lock.json"}
 
@@ -48,7 +53,7 @@ def main(check: bool) -> int:
     for path in stale:
         print(("out of date: " if check else "copied: ") + str(path))
     if not stale:
-        print("Hermes edition is up to date.")
+        print("All copies are up to date.")
     return 1 if check and stale else 0
 
 
