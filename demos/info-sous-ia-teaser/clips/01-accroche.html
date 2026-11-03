@@ -1,0 +1,12 @@
+<title>01 Accroche</title>
+<div data-slot="world">
+  <div class="halftoneW"></div>
+  <div class="stk AN" id="st" style="left:-760px;top:-440px;font-size:54px;padding:6px 22px;background:#E9FF00;color:#0B0B0B;transform-origin:0 50%">Info ou intox ?</div>
+  <div class="a B" id="l1" style="left:-760px;top:-330px;font-size:210px;color:#fff">L'IA répond</div>
+  <div class="a B" id="l2" style="left:-760px;top:-145px;font-size:210px;color:#fff">à tout.</div>
+  <div class="a B" id="l3" style="left:-760px;top:60px;font-size:210px;color:#fff">Même quand</div>
+  <div class="a B" id="l4" style="left:-780px;top:250px;font-size:210px;padding:4px 26px 0;background:#E9FF00;color:#0B0B0B;transform-origin:0 50%">elle se trompe.</div>
+</div><!--/world-->
+<script>
+M.scene({...NOSHAPE,bg:INK,T:4.5,extra:t=>{slap($('st'),t,0.2,-4); rise($('l1'),t,0.6); rise($('l2'),t,1.1); rise($('l3'),t,2.0); wipe($('l4'),t,2.5,null,0.3,-2);}});
+</script>

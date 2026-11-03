@@ -1,0 +1,17 @@
+<title>05 Missions</title>
+<style>.tag{position:absolute;top:20px;font-size:72px;padding:8px 30px 4px;transform-origin:50% 50%}</style>
+<div data-slot="world">
+  <div class="halftoneW"></div>
+  <div class="a I7" id="k" style="left:-800px;top:-400px;font-size:34px;letter-spacing:.08em;color:#9A9791">ENTRE LES SÉANCES</div>
+  <div class="a B" id="h" style="left:-800px;top:-340px;font-size:250px;color:#fff">Des missions</div>
+  <div class="stk AN" id="m1" style="left:330px;top:-440px;font-size:60px;padding:6px 24px;background:#E9FF00;color:#0B0B0B">Mission 01</div>
+  <div class="AN tag" id="t0" style="left:-800px;background:#0453E1;color:#fff">Workbooks</div>
+  <div class="AN tag" id="t1" style="left:-400px;background:#E9FF00;color:#0B0B0B">Quiz</div>
+  <div class="AN tag" id="t2" style="left:-160px;background:#F8F6F2;color:#0B0B0B">Certification AFP</div>
+  <div class="a" id="tx" style="left:-800px;top:220px;font-family:'Inter';font-weight:600;font-size:40px;color:#fff;white-space:nowrap">Des exercices de 45 à 60 minutes, à faire en autonomie.</div>
+</div><!--/world-->
+<script>
+const TT=[1.8,2.3,2.8], TR=[-3,2,-2];
+M.scene({...NOSHAPE,bg:INK,T:6,extra:t=>{rise($('k'),t,0.15,null,0.3,20); rise($('h'),t,0.4); slap($('m1'),t,1.0,-5);
+  TT.forEach((c,i)=>slap($('t'+i),t,c,TR[i])); wipe($('tx'),t,3.6,null,0.5);}});
+</script>

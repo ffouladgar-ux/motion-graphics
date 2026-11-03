@@ -1,0 +1,24 @@
+<title>04 Trois jours</title>
+<style>
+.card{position:absolute;top:-250px;width:500px;height:540px;transform-origin:50% 50%}
+.card .in{position:absolute;inset:0}
+.card .tg{position:absolute;left:34px;top:34px;font-size:30px;padding:8px 18px;transform:rotate(-3deg)}
+.card .tt{position:absolute;left:34px;top:130px;font-size:88px}
+.card .ph{position:absolute;left:34px;bottom:40px;width:430px;font-family:'Inter';font-weight:700;font-size:34px;line-height:42px}
+</style>
+<div data-slot="world">
+  <div class="halftone"></div>
+  <div class="a B" id="hd" style="left:-800px;top:-470px;font-size:150px">Bootcamp B1</div>
+  <div class="stk" id="hs" style="left:-80px;top:-452px;font-size:40px;padding:10px 22px;background:#0453E1;color:#fff">3 × 3 h</div>
+  <div class="card" id="c0" style="left:-800px"><div class="in" id="i0" style="background:#0B0B0B;color:#fff"><div class="stk tg" style="background:#E9FF00;color:#0B0B0B">Jour 01</div><div class="B tt">Comprendre</div><div class="ph">L'IA ne sait pas ce qu'elle dit.</div></div></div>
+  <div class="card" id="c1" style="left:-250px"><div class="in" id="i1" style="background:#0453E1;color:#fff"><div class="stk tg" style="background:#E9FF00;color:#0B0B0B">Jour 02</div><div class="B tt">Expérimenter</div><div class="ph">Apprendre à guider l'IA.</div></div></div>
+  <div class="card" id="c2" style="left:300px"><div class="in" id="i2" style="background:#E9FF00;color:#0B0B0B"><div class="stk tg" style="background:#0B0B0B;color:#fff">Jour 03</div><div class="B tt" style="line-height:.86">Vérifier<br>et décider</div><div class="ph">L'IA à l'épreuve du journalisme.</div></div></div>
+  <div class="stk AN" id="rt" style="left:-800px;top:338px;font-size:44px;padding:6px 20px;background:#E9FF00;color:#0B0B0B">À retenir</div>
+  <div class="a" id="rx" style="left:-490px;top:330px;width:1290px;font-family:'Inter';font-weight:700;font-size:38px;line-height:48px">L'IA vous aide à préparer. Jamais à rédiger l'article à votre place.</div>
+</div><!--/world-->
+<script>
+[0,1,2].forEach(i=>torn($('i'+i),500,540,8,24,i+5));
+const CT=[1.0,2.5,4.0], CR=[-2,1.5,-1.2];
+M.scene({...NOSHAPE,bg:PA,T:9.5,extra:t=>{rise($('hd'),t,0.15); slap($('hs'),t,0.5,4);
+  CT.forEach((c,i)=>slap($('c'+i),t,c,CR[i],null,1.25)); slap($('rt'),t,6.0,-3); wipe($('rx'),t,6.3,null,0.5);}});
+</script>

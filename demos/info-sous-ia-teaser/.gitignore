@@ -1,0 +1,6 @@
+dist/
+work/
+out/
+audio/__pycache__/
+assets/bienvenue.jpg
+assets/journal.jpg

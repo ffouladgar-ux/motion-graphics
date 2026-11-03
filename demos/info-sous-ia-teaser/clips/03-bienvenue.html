@@ -1,0 +1,9 @@
+<title>03 Bienvenue</title>
+<div data-slot="world">
+  <img id="bv" src="../assets/bienvenue.jpg" class="a" style="left:-1350px;top:-540px;width:2701px;height:1080px;transform-origin:50% 50%">
+  <div class="stk" id="st" style="left:-390px;top:380px;font-size:46px;padding:12px 28px;background:#0B0B0B;color:#E9FF00;transform-origin:50% 50%">Bootcamp B1 • 3 jours</div>
+</div><!--/world-->
+<script>
+M.scene({...NOSHAPE,bg:INK,T:4,extra:t=>{const k=M.S(t,16,0.8); const b=$('bv').style; b.transform=`scale(${(1.25-0.17*k-0.06*M.eo(t/4)).toFixed(4)})`; b.opacity=M.clamp(t/0.08);
+  slap($('st'),t,1.6,-3);}});
+</script>

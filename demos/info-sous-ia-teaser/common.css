@@ -1,0 +1,19 @@
+@font-face{font-family:'Bebas';src:url(../assets/BebasNeue.woff2)}
+@font-face{font-family:'Anton';src:url(../assets/Anton.woff2)}
+@font-face{font-family:'Inter';src:url(../assets/Inter-400.woff2);font-weight:400}
+@font-face{font-family:'Inter';src:url(../assets/Inter-600.woff2);font-weight:600}
+@font-face{font-family:'Inter';src:url(../assets/Inter-700.woff2);font-weight:700}
+@font-face{font-family:'Inter';src:url(../assets/Inter-800.woff2);font-weight:800}
+#stage{font-family:'Inter',sans-serif;color:#0B0B0B}
+#shape{box-shadow:none!important}
+.B{font-family:'Bebas',sans-serif;font-weight:400;line-height:.88;white-space:nowrap;letter-spacing:.005em}
+.AN{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;white-space:nowrap}
+.I7{font-family:'Inter';font-weight:700;white-space:nowrap}
+.I4{font-family:'Inter';font-weight:400}
+.a{position:absolute}
+.stk{position:absolute;white-space:nowrap;font-family:'Inter';font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+.halftone{position:absolute;left:-1100px;top:-700px;width:2200px;height:1400px;background-image:radial-gradient(rgba(11,11,11,.16) 1.6px,transparent 2px);background-size:14px 14px}
+.halftoneW{position:absolute;left:-1100px;top:-700px;width:2200px;height:1400px;background-image:radial-gradient(rgba(248,246,242,.10) 1.6px,transparent 2px);background-size:14px 14px}
+.paper{background:#F8F6F2}
+.cut{filter:drop-shadow(0 6px 0 rgba(11,11,11,.9))}
+#fontwarm{position:absolute;left:-9999px;top:0;opacity:0}
