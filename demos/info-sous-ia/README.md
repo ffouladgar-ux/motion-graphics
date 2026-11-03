@@ -25,3 +25,16 @@ E=../../skills/motion-broll/engine
 for c in dist/*.html; do node $E/render.js $c out/$(basename $c .html).mp4 30; done
 # then join with 0.4 s crossfades (xfade) into out/info-sous-ia-demo.mp4
 ```
+
+## Soundtrack
+
+French voiceover made locally with [Piper](https://github.com/rhasspy/piper) (voice `fr_FR-siwis-medium`) plus sound effects synthesized in code (whooshes, key clicks, ticks, pops, chimes), ducked under the voice and normalized to -16 LUFS.
+
+- `audio/lines.py`: the script, with each line's start time. Spellings are phonetic for the voice: "I A" (said "i-a"), "prommpte", "ouorkbouk". Never start a line with a capital "L'I": the voice reads it as "elle apostrophe".
+- `audio/mix.py`: builds the effects track, places the voice, mixes, and muxes onto the video.
+
+```bash
+# voices: https://huggingface.co/rhasspy/piper-voices (fr/fr_FR/siwis/medium)
+python3 -c "import wave; from piper import PiperVoice; from lines import LINES; v=PiperVoice.load('fr_FR-siwis-medium.onnx'); [v.synthesize_wav(s, wave.open(f'vo/vo_{i}.wav','wb')) for i,(t,s,m) in enumerate(LINES)]"
+python3 audio/mix.py vo out/info-sous-ia-demo.mp4 out/info-sous-ia-demo-vo.mp4
+```
