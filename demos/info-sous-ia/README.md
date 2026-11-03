@@ -36,5 +36,6 @@ French voiceover made locally with [Piper](https://github.com/rhasspy/piper) (vo
 ```bash
 # voices: https://huggingface.co/rhasspy/piper-voices (fr/fr_FR/siwis/medium)
 python3 -c "import wave; from piper import PiperVoice; from lines import LINES; v=PiperVoice.load('fr_FR-siwis-medium.onnx'); [v.synthesize_wav(s, wave.open(f'vo/vo_{i}.wav','wb')) for i,(t,s,m) in enumerate(LINES)]"
-python3 audio/mix.py vo out/info-sous-ia-demo.mp4 out/info-sous-ia-demo-vo.mp4
+python3 audio/mix.py vo out/info-sous-ia-demo.mp4 out/info-sous-ia-demo-vo.mp4     # with voice
+python3 audio/mix.py none out/info-sous-ia-demo.mp4 out/info-sous-ia-demo-sfx.mp4  # sound effects only (-20 LUFS)
 ```

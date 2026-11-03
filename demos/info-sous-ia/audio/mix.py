@@ -1,5 +1,6 @@
 """Build the soundtrack: French voiceover (Piper, local) + synthesized sound effects, then mux onto the video.
-usage: python3 mix.py <voice_dir with vo_N.wav> <video.mp4> <out.mp4>"""
+usage: python3 mix.py <voice_dir with vo_N.wav | none> <video.mp4> <out.mp4>
+   voice_dir "none" = sound effects only."""
 import sys, subprocess, numpy as np, pathlib
 from lines import LINES
 SR=48000; rng=np.random.default_rng(7)
@@ -73,7 +74,7 @@ fx=np.zeros(N,np.float32)
 for t0,snd in EV:
     i=int(t0*SR); fx[i:i+len(snd)]+=snd[:N-i]
 vo=np.zeros(N,np.float32); act=np.zeros(N,np.float32)
-for i,(t0,_,_) in enumerate(LINES):
+for i,(t0,_,_) in enumerate(LINES if VO!='none' else []):
     v=load(f'{VO}/vo_{i}.wav'); a=int(t0*SR); vo[a:a+len(v)]+=v; act[a:a+len(v)]=1
 vo/=np.abs(vo).max()+1e-9
 # duck effects under the voice (smoothed)
@@ -82,5 +83,5 @@ mix=0.9*vo+fxg*fx
 mix=mix[:int(T*SR)]; mix/=max(1.0,np.abs(mix).max()/0.95)
 tmp=pathlib.Path(OUT).with_suffix('.raw'); mix.astype(np.float32).tofile(tmp)
 subprocess.run(['ffmpeg','-loglevel','error','-y','-i',VID,'-f','f32le','-ar',str(SR),'-ac','1','-i',str(tmp),
-  '-filter_complex','[1:a]loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000,pan=stereo|c0=c0|c1=c0[a]','-map','0:v','-map','[a]','-c:v','copy','-c:a','aac','-b:a','192k','-shortest','-movflags','+faststart',OUT],check=True)
+  '-filter_complex',f'[1:a]loudnorm=I={-16 if VO!="none" else -20}:TP=-1.5:LRA=11,aresample=48000,pan=stereo|c0=c0|c1=c0[a]','-map','0:v','-map','[a]','-c:v','copy','-c:a','aac','-b:a','192k','-shortest','-movflags','+faststart',OUT],check=True)
 tmp.unlink(); print('wrote',OUT,len(EV),'effects')
