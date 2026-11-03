@@ -1,0 +1,46 @@
+<title>03 Rangement automatique</title>
+<style>
+.ml{color:#8A8782}
+.seg6{position:absolute;width:170px;text-align:center;top:22px;color:#fff;font-size:24px;font-weight:500;font-family:'Geist Mono',monospace}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lnote">
+    <div class="row ml" style="left:-540px;top:44px;gap:12px;font-size:26px"><span id="icPen"></span>Vous dites à Claude :</div>
+    <div class="a" id="note" style="left:-540px;top:94px;font-size:48px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;transform-origin:0 50%"><span id="typed"></span><span id="caret" style="display:inline-block;width:4px;height:48px;background:#FF5A1F;vertical-align:-8px;margin-left:4px"></span></div>
+    <div class="a ml" id="lab" style="left:-540px;top:196px;font-size:26px">Claude range tout seul :</div>
+    <div class="a" id="track" style="left:-510px;top:250px;width:1020px;height:76px;border-radius:38px;background:#F1EFEB">
+      <div class="a" id="ind" style="top:6px;height:64px;border-radius:32px;background:#0B0B0B"></div>
+      <div class="a blend" style="left:0;top:0;width:1020px;height:76px" id="segs"></div>
+    </div>
+    <div class="row mono" id="res" style="left:-540px;top:372px;gap:14px;font-size:28px;transform-origin:0 50%"><span id="okc" style="width:40px;height:40px;border-radius:20px;background:#FF5A1F;display:flex;align-items:center;justify-content:center"></span><span id="path"></span></div>
+    <div class="a ml" id="foot" style="left:-540px;top:452px;font-size:26px;white-space:nowrap">Un doute ? Direction inbox. Rien n'est jamais perdu.</div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+$('icPen').innerHTML=M.icon('pencil',26,'#8A8782'); $('okc').innerHTML=M.icon('check',22,'#fff',3);
+const CMP=['studies','business','people','personal','health','inbox'];
+$('segs').innerHTML=CMP.map((n,i)=>`<div class="seg6" style="left:${i*170}px">${n}</div>`).join('');
+const A='Rendu du mémoire vendredi à 14h', B='Envoyer le devis au client lundi';
+const segL=i=>i*170+6, segR=i=>(i+1)*170-6;
+const iL=M.track(segL(0),[[6.7,segL(1),M.SLOW]]), iR=M.track(segR(0),[[6.7,segR(1),M.FAST]]);
+const fade=(el,v,dy=0)=>{const s=el.style;s.opacity=v.o;s.filter=v.blur>0.05?`blur(${v.blur}px)`:'none';s.transform=`translateY(${dy}px) scale(${v.s})`;};
+M.scene({W:1920,H:1080,bg:'#E9E7E2',T:9.5,intro:0.12,
+  SH:{note:{w:1200,h:540,r:40,bg:'#FFFFFF',cam:1.2}},
+  start:'note',SEQ:[],
+  layers:[
+    {el:'Lnote',tin:0.12,tout:null,o:{din:0.05},anchor:'t',update:t=>{
+      let txt,ty0,ty1,v;
+      if(t<4.95){txt=A;ty0=0.45;ty1=1.75;v=M.vis(t,null,4.75);} else {txt=B;ty0=5.05;ty1=6.15;v=M.vis(t,4.95,null,{din:0,lin:0.15});}
+      const n=Math.round(M.clamp((t-ty0)/(ty1-ty0))*txt.length); M.setText($('typed'),txt.slice(0,n)); fade($('note'),v);
+      const typing=(t>ty0-0.05&&t<ty1+0.05); $('caret').style.opacity=(typing||(Math.floor(t*2.4)%2==0&&t<ty1+0.9))?1:0;
+      fade($('lab'),M.vis(t,2.0,null,{din:0,lin:0.22}));
+      fade($('track'),M.vis(t,2.15,null,{din:0,lin:0.25}));
+      const iv=M.vis(t,2.6,null,{din:0,lin:0.18}); const L=iL(t),R=iR(t);
+      Object.assign($('ind').style,{left:L+'px',width:Math.max(0,R-L)+'px',opacity:iv.o,transform:`scale(${0.9+0.1*iv.a})`});
+      let rv; if(t<6.95){rv=M.vis(t,3.0,6.75);M.setText($('path'),'studies/2026-11.md');} else {rv=M.vis(t,6.95,null,{din:0,lin:0.2});M.setText($('path'),'business/2026-11.md');}
+      fade($('res'),rv,(1-rv.a)*10);
+      fade($('foot'),M.vis(t,8.0,null,{din:0,lin:0.25}));
+    }},
+  ]});
+</script>

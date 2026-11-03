@@ -1,0 +1,4 @@
+dist/
+work/
+out/*
+!out/marina-memory-demo.mp4

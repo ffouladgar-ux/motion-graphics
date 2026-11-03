@@ -1,0 +1,59 @@
+<title>04 Retrouver</title>
+<style>
+.ml{color:#8A8782}
+.rw{position:absolute;left:-510px;width:1020px;height:108px;border-radius:20px}
+.rw .cp{position:absolute;left:24px;top:34px;height:40px;line-height:40px;padding:0 16px;border-radius:20px;background:#F1EFEB;font-family:'Geist Mono',monospace;font-size:20px}
+.rw .tx{position:absolute;left:200px;top:34px;font-size:32px;font-weight:500;white-space:nowrap}
+.sec{position:absolute;left:-380px;width:760px;height:84px}
+.sec .hd{position:absolute;left:28px;top:8px;height:18px;border-radius:9px;background:#0B0B0B}
+.sec .sk{position:absolute;left:28px;height:10px;border-radius:5px;background:#D9D5CE}
+.sec .bar{position:absolute;left:0;top:4px;width:6px;height:76px;border-radius:3px;background:#FF5A1F;transform-origin:50% 0}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lsearch">
+    <div class="row" style="left:-450px;top:0;transform:translateY(-50%);gap:22px;font-size:42px;font-weight:500;letter-spacing:-.01em"><span id="icS"></span><span><span id="typed"></span><span id="caret" style="display:inline-block;width:3px;height:44px;background:#0B0B0B;vertical-align:-8px;margin-left:3px"></span></span></div>
+    <div class="a mono ml" style="left:230px;top:-14px;width:220px;text-align:right;font-size:22px">memory_recall</div>
+  </div>
+  <div class="L" id="Lres">
+    <div class="row" style="left:-510px;top:36px;gap:16px;font-size:30px;font-weight:600"><span id="icS2"></span>rendu du mémoire</div>
+    <div class="a mono ml" style="left:210px;top:42px;width:300px;text-align:right;font-size:22px">memory_recall</div>
+    <div class="a" style="left:-550px;top:100px;width:1100px;height:1.5px;background:#EAE7E2"></div>
+    <div class="rw" id="r0" style="top:124px"><div class="cp">studies</div><div class="tx">Rendu du mémoire vendredi à 14h</div></div>
+    <div class="rw" id="r1" style="top:252px"><div class="cp">studies</div><div class="tx">Plan du mémoire validé en 3 parties</div></div>
+    <div class="rw" id="r2" style="top:380px"><div class="cp">sources</div><div class="tx mono" style="font-size:28px;top:36px">guide-memoire.md</div></div>
+  </div>
+  <div class="L" id="Ldoc">
+    <div class="row mono" style="left:-400px;top:36px;gap:12px;font-size:26px"><span id="icF"></span>guide-memoire.md</div>
+    <div class="a ml" style="left:-400px;top:84px;font-size:24px;white-space:nowrap">memory_open · seulement les passages utiles</div>
+    <div class="a" style="left:-450px;top:134px;width:900px;height:1.5px;background:#EAE7E2"></div>
+    <div id="secs"></div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+$('icS').innerHTML=M.icon('search',40,'#0B0B0B'); $('icS2').innerHTML=M.icon('search',30,'#0B0B0B'); $('icF').innerHTML=M.icon('file',28,'#0B0B0B');
+const HW=[260,320,220,300,240], SW=[[640,520],[600,560],[660,480],[620,540],[580,500]], HIT=[1,3];
+$('secs').innerHTML=HW.map((w,i)=>`<div class="sec" id="s${i}" style="top:${160+i*100}px"><div class="bar"></div><div class="hd" style="width:${w}px"></div><div class="sk" style="top:42px;width:${SW[i][0]}px"></div><div class="sk" style="top:62px;width:${SW[i][1]}px"></div></div>`).join('');
+const Q='rendu du mémoire', TY0=0.45, TY1=1.45;
+const hov=M.track(0,[[3.15,1,[20,1]]]);
+const focus=M.track(0,[[5.3,1,M.SOFT]]);
+const fade=(el,v,dy=0)=>{const s=el.style;s.opacity=v.o;s.filter=v.blur>0.05?`blur(${v.blur}px)`:'none';s.transform=`translateY(${dy}px)`;};
+M.scene({W:1920,H:1080,bg:'#E9E7E2',T:8,intro:0.12,
+  SH:{search:{w:1000,h:124,r:62,bg:'#FFFFFF',cam:1.5},res:{w:1100,h:560,r:32,bg:'#FFFFFF',cam:1.2},doc:{w:900,h:700,r:28,bg:'#FFFFFF',cam:1.12}},
+  start:'search',SEQ:[[1.9,'res'],[4.05,'doc']],
+  layers:[
+    {el:'Lsearch',tin:0.12,tout:1.9,o:{din:0.05},update:t=>{
+      const n=Math.round(M.clamp((t-TY0)/(TY1-TY0))*Q.length); M.setText($('typed'),Q.slice(0,n));
+      $('caret').style.opacity=((t>TY0-0.05&&t<TY1+0.05)||Math.floor(t*2.4)%2==0)?1:0;}},
+    {el:'Lres',tin:1.9,tout:4.05,anchor:'t',update:t=>{
+      [0,1,2].forEach(i=>{const v=M.vis(t,2.05+0.14*i,null,{din:0,lin:0.22}); fade($('r'+i),v,(1-v.a)*14);});
+      $('r2').style.background=`rgba(233,231,226,${(0.7*hov(t)).toFixed(3)})`;}},
+    {el:'Ldoc',tin:4.05,tout:null,anchor:'t',update:t=>{
+      const f=focus(t);
+      HW.forEach((_,i)=>{const s=$('s'+i), hit=HIT.includes(i); const v=M.vis(t,4.2+0.08*i,null,{din:0,lin:0.22});
+        s.style.opacity=(v.o*(hit?1:1-0.8*f)).toFixed(3); s.style.filter=v.blur>0.05?`blur(${v.blur}px)`:'none';
+        s.querySelector('.bar').style.transform=`scaleY(${hit?M.clamp(f):0})`;});}},
+  ],
+  cursor:{size:44,clicks:[3.8],keys:[[0,380,170],[1.9,380,170],[3.05,-150,150],[3.95,-150,150],[4.8,300,240]]},
+});
+</script>

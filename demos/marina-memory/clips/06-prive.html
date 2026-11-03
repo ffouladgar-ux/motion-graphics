@@ -1,0 +1,35 @@
+<title>06 Privé</title>
+<style>
+.ml{color:#8A8782}
+.pr{position:absolute;left:-440px;display:flex;align-items:center;gap:22px;font-size:32px;font-weight:500;white-space:nowrap}
+.pr i{width:48px;height:48px;border-radius:24px;background:#0B0B0B;display:flex;align-items:center;justify-content:center;font-style:normal}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lpill"><div class="row" style="transform:translate(-50%,-50%);gap:16px;color:#fff;font-size:42px;font-weight:600;letter-spacing:-.01em"><span id="icL"></span>Vos notes, votre disque</div></div>
+  <div class="L" id="Lcard">
+    <div class="a" style="left:-440px;top:44px;font-size:36px;font-weight:600;letter-spacing:-.01em;white-space:nowrap">Rien ne quitte votre ordinateur</div>
+    <div class="pr" id="p0" style="top:126px"><i></i>Aucun appel réseau</div>
+    <div class="pr" id="p1" style="top:206px"><i></i>Aucune clé API, aucun compte, aucune télémétrie</div>
+    <div class="pr" id="p2" style="top:286px"><i></i>Des fichiers Markdown, lisibles partout</div>
+    <div class="a" id="foot" style="left:-440px;top:390px;font-size:28px;white-space:nowrap"><span class="ml">Le code est public.</span> <b style="font-weight:600;color:#FF5A1F">Votre mémoire, non.</b></div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+M.IC.lock=['M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2Z','M7 11V7a5 5 0 0 1 10 0v4'];
+$('icL').innerHTML=M.icon('lock',40,'#FF5A1F');
+[0,1,2].forEach(i=>$('p'+i).querySelector('i').innerHTML=M.icon('check',24,'#fff',3));
+const PT=[1.95,2.55,3.15];
+const fade=(el,v,dy=0)=>{const s=el.style;s.opacity=v.o;s.filter=v.blur>0.05?`blur(${v.blur}px)`:'none';s.transform=`translateY(${dy}px)`;};
+const dot=PT.map(p=>M.track(0,[[p+0.12,1,[18,0.7]]]));
+M.scene({W:1920,H:1080,bg:'#E9E7E2',T:7,intro:0.12,
+  SH:{pill:{w:640,h:124,r:62,bg:'#0B0B0B',cam:1.8},card:{w:1000,h:480,r:40,bg:'#FFFFFF',cam:1.3}},
+  start:'pill',SEQ:[[1.4,'card']],
+  layers:[
+    {el:'Lpill',tin:0.12,tout:1.4,o:{din:0.05}},
+    {el:'Lcard',tin:1.4,tout:null,anchor:'t',update:t=>{
+      PT.forEach((p,i)=>{const v=M.vis(t,p,null,{din:0,lin:0.22}); fade($('p'+i),v,(1-v.a)*12); const d=dot[i](t); const ic=$('p'+i).querySelector('i').style; ic.background=`rgb(${Math.round(11+(255-11)*M.clamp(d))},${Math.round(11+(90-11)*M.clamp(d))},${Math.round(11+(31-11)*M.clamp(d))})`; ic.transform=`scale(${(1+0.12*Math.sin(Math.PI*M.clamp((t-p-0.12)/0.3))).toFixed(4)})`;});
+      fade($('foot'),M.vis(t,4.4,null,{din:0,lin:0.28}));
+    }},
+  ]});
+</script>

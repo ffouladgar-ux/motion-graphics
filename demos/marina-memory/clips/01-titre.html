@@ -1,0 +1,29 @@
+<title>01 Marina Memory</title>
+<style>
+.chip{position:absolute;display:flex;align-items:center;gap:12px;height:56px;padding:0 24px;border-radius:28px;background:#F1EFEB;font-size:28px;font-weight:500;white-space:nowrap;top:84px}
+.chip i{width:12px;height:12px;border-radius:50%;background:#FF5A1F;display:block}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lpill"><div class="row" style="transform:translate(-50%,-50%);gap:18px;color:#fff;font-size:48px;font-weight:600;letter-spacing:-.02em"><span id="icSpark"></span>Marina Memory<span id="badge" style="display:inline-block;background:#FF5A1F;color:#fff;font-size:22px;font-weight:600;letter-spacing:0;border-radius:999px;padding:6px 14px">MCP</span></div></div>
+  <div class="L" id="Lcard">
+    <div class="row mono" style="left:-470px;top:-168px;gap:10px;font-size:22px;color:#8A8782"><span id="icFolder"></span>marina-memory</div>
+    <div class="a" style="left:-470px;top:-118px;width:940px;font-size:64px;line-height:72px;font-weight:600;letter-spacing:-.03em">Une mémoire permanente<br>pour Claude.</div>
+    <div class="chip" id="c0" style="left:-470px"><i></i>Locale</div>
+    <div class="chip" id="c1" style="left:-268px"><i></i>Gratuite</div>
+    <div class="chip" id="c2" style="left:-44px"><i></i>Privée</div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+$('icSpark').innerHTML=M.icon('sparkle',42,'#FF5A1F');
+$('icFolder').innerHTML=M.icon('folder',24,'#8A8782');
+const badge=M.track(0,[[0.7,1,[16,0.7]]]);
+const CT=[2.6,2.85,3.1];
+M.scene({W:1920,H:1080,bg:'#E9E7E2',T:5,intro:0.15,
+  SH:{pill:{w:610,h:124,r:62,bg:'#0B0B0B',cam:1.8},card:{w:1060,h:420,r:40,bg:'#FFFFFF',cam:1.35}},
+  start:'pill',SEQ:[[1.9,'card']],
+  layers:[
+    {el:'Lpill',tin:0.15,tout:1.9,o:{din:0.05},update:t=>{const b=badge(t);$('badge').style.transform=`scale(${Math.max(0,b).toFixed(4)})`;$('badge').style.opacity=M.clamp(b*1.5);}},
+    {el:'Lcard',tin:1.9,tout:null,update:t=>{CT.forEach((c,i)=>{const v=M.vis(t,c,null,{din:0,lin:0.22});const s=$('c'+i).style;s.opacity=v.o;s.filter=v.blur>0.05?`blur(${v.blur}px)`:'none';s.transform=`translateY(${(1-v.a)*14}px)`;});}},
+  ]});
+</script>

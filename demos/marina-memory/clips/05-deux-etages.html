@@ -1,0 +1,48 @@
+<title>05 Deux étages</title>
+<style>
+.ml{color:#8A8782}
+.fr{position:absolute;left:-10px;width:600px;height:68px;border-radius:18px;background:#F4F2EE}
+.fr .p{position:absolute;left:22px;top:0;height:68px;display:flex;align-items:center;gap:14px;font-family:'Geist Mono',monospace;font-size:24px;white-space:nowrap}
+.hl{position:absolute;left:20px;height:14px;border-radius:7px;background:rgba(255,255,255,.2)}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Lvault"><div class="row mono" style="transform:translate(-50%,-50%);gap:16px;color:#fff;font-size:40px"><span id="icV"></span>~/MemoryVault</div></div>
+  <div class="L" id="Ltiers">
+    <div class="a" style="left:-590px;top:40px;font-size:34px;font-weight:600;letter-spacing:-.01em;white-space:nowrap">Deux étages : seul l'index reste en contexte</div>
+    <div class="a" id="hot" style="left:-590px;top:118px;width:520px;height:380px;border-radius:26px;background:#0B0B0B">
+      <div class="row mono" style="left:32px;top:34px;gap:12px;color:#fff;font-size:28px"><span id="icF"></span>index.md</div>
+      <div class="a" id="tok" style="left:32px;top:88px;height:44px;line-height:44px;padding:0 18px;border-radius:22px;background:#FF5A1F;color:#fff;font-size:22px;font-weight:600;white-space:nowrap;transform-origin:0 50%">≈ 900 tokens</div>
+      <div id="hls"></div>
+      <div class="a" style="left:32px;top:326px;font-size:22px;color:#9A9791">toujours chargé</div>
+    </div>
+    <div class="a ml" id="coldL" style="left:-10px;top:124px;font-size:24px;white-space:nowrap">lus à la demande, par sections</div>
+    <div id="rows"></div>
+    <div class="row" id="foot" style="left:-590px;top:544px;gap:14px;font-size:26px"><span id="icS"></span>Recherche locale (SQLite FTS5) · aucune clé API · aucun appel payant</div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+$('icV').innerHTML=M.icon('folder',40,'#FF5A1F'); $('icF').innerHTML=M.icon('file',28,'#fff'); $('icS').innerHTML=M.icon('search',26,'#0B0B0B');
+$('hls').innerHTML=[300,240,280,200,260].map((w,i)=>`<div class="hl" style="left:32px;top:${164+i*30}px;width:${w}px"></div>`).join('');
+const FILES=['studies/2026-11.md','business/2026-11.md','people/2026-11.md','sources/chapitre3.md'];
+$('rows').innerHTML=FILES.map((f,i)=>`<div class="fr" id="f${i}" style="top:${170+i*84}px"><div class="p"><span class="ic"></span>${f}</div></div>`).join('');
+FILES.forEach((f,i)=>$('f'+i).querySelector('.ic').innerHTML=M.icon(i==3?'file':'folder',26,'#8A8782'));
+$('f3').insertAdjacentHTML('beforeend','<div class="a" id="read" style="right:16px;top:14px;height:40px;line-height:40px;padding:0 16px;border-radius:20px;background:#FF5A1F;color:#fff;font-size:20px;font-weight:600;white-space:nowrap">lu à la demande</div>');
+const tok=M.track(0,[[2.2,1,[16,0.75]]]), hit=M.track(0,[[5.1,1,[18,0.85]]]);
+const fade=(el,v,dy=0)=>{const s=el.style;s.opacity=v.o;s.filter=v.blur>0.05?`blur(${v.blur}px)`:'none';s.transform=`translateY(${dy}px)`;};
+M.scene({W:1920,H:1080,bg:'#E9E7E2',T:8,intro:0.12,
+  SH:{vault:{w:560,h:124,r:62,bg:'#0B0B0B',cam:1.8},tiers:{w:1300,h:640,r:36,bg:'#FFFFFF',cam:1.12}},
+  start:'vault',SEQ:[[1.3,'tiers']],
+  layers:[
+    {el:'Lvault',tin:0.12,tout:1.3,o:{din:0.05}},
+    {el:'Ltiers',tin:1.3,tout:null,anchor:'t',update:t=>{
+      const hv=M.vis(t,1.55,null,{din:0,lin:0.25}); fade($('hot'),hv,(1-hv.a)*16);
+      const k=tok(t); $('tok').style.transform=`scale(${Math.max(0,k).toFixed(4)})`; $('tok').style.opacity=M.clamp(k*1.5);
+      fade($('coldL'),M.vis(t,2.9,null,{din:0,lin:0.22}));
+      FILES.forEach((_,i)=>{const v=M.vis(t,3.05+0.15*i,null,{din:0,lin:0.22}); fade($('f'+i),v,(1-v.a)*14);});
+      const h=M.clamp(hit(t)); $('f3').style.boxShadow=`inset 0 0 0 ${(3*h).toFixed(2)}px #FF5A1F`;
+      $('read').style.opacity=h; $('read').style.transform=`scale(${(0.8+0.2*h).toFixed(4)})`;
+      fade($('foot'),M.vis(t,6.0,null,{din:0,lin:0.25}),0);
+    }},
+  ]});
+</script>
