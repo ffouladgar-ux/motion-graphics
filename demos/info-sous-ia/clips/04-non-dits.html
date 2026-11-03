@@ -1,0 +1,30 @@
+<title>04 Les non-dits</title>
+<style>
+.it{position:absolute;display:flex;align-items:center;gap:24px;font-size:36px;white-space:nowrap}
+.cb{width:40px;height:40px;box-sizing:border-box;border:3px solid #0057FF;display:flex;align-items:center;justify-content:center}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Llist"><div id="items"></div></div>
+  <div class="L" id="Lq">
+    <div class="a U" style="left:-740px;top:-62px;font-size:24px;color:#E9FF00">À vous de jouer</div>
+    <div class="a U" style="left:-740px;top:-14px;font-size:40px;color:#fff">Quelles décisions l'IA a-t-elle prises à votre place ?</div>
+  </div>
+</div><!--/shape-->
+<script>
+HDR('a','Mission 01 / Enquête','Les non-dits','Qu\'a dû supposer l\'IA pour pouvoir vous répondre ?','02');
+const IT=['Votre public cible','Le type de média','Le territoire concerné','L\'âge précis des adolescents','L\'angle journalistique','Le format ou les délais'];
+$('items').innerHTML=IT.map((s,i)=>`<div class="it R" id="i${i}" style="left:${i<3?-700:60}px;top:${-150+(i%3)*110}px"><div class="cb" id="c${i}"></div>${s}</div>`).join('');
+IT.forEach((_,i)=>$('c'+i).innerHTML=M.icon('check',26,'#fff',3.4));
+const CT=IT.map((_,i)=>1.9+0.42*i);
+M.scene({W:1920,H:1080,bg:PA,T:8,intro:0.8,
+  SH:{list:{w:1600,h:420,r:0,bg:'#FFFFFF',cam:1},q:{w:1600,h:200,r:0,bg:INK,cam:1}},
+  start:'list',SEQ:[[5.5,'q']],
+  layers:[
+    {el:'Llist',tin:0.8,tout:5.5,o:{din:0.05},update:t=>{IT.forEach((_,i)=>{rise($('i'+i),t,1.0+0.1*i,null,0.4,16);
+      const k=M.clamp((t-CT[i])/0.18); const c=$('c'+i); c.style.background=k>0?`rgba(0,87,255,${k})`:'transparent'; c.firstChild.style.opacity=k; c.style.transform=`scale(${(1+0.15*Math.sin(Math.PI*k)).toFixed(3)})`;});}},
+    {el:'Lq',tin:5.5,tout:null},
+  ],
+  geom:(t,g)=>{g.cy=90; return g;},
+  extra:t=>HDRA('a',t,0.1)
+});
+</script>

@@ -1,0 +1,9 @@
+@font-face{font-family:'ISI';src:url(../assets/DejaVuSansCondensed-Bold.ttf);font-weight:700}
+@font-face{font-family:'ISI';src:url(../assets/DejaVuSansCondensed.ttf);font-weight:400}
+#stage{font-family:'ISI',sans-serif;color:#0B0B0B;font-weight:700}
+#shape{box-shadow:none!important}
+.U{text-transform:uppercase;font-weight:700;letter-spacing:.01em;white-space:nowrap}
+.R{font-weight:400}
+.tag{position:absolute;background:#E9FF00;color:#0B0B0B;font-weight:700;text-transform:uppercase;font-size:24px;height:50px;line-height:50px;padding:0 22px;white-space:nowrap}
+.dot{position:absolute;width:12px;height:12px;background:#E9FF00}
+#fontwarm{position:absolute;left:-9999px;top:0;opacity:0}

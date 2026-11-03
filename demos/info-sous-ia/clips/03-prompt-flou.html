@@ -1,0 +1,36 @@
+<title>03 Le prompt flou</title>
+<style>
+.st{position:absolute;left:-800px;font-size:32px;white-space:nowrap}
+.pl{position:absolute;height:16px;background:#E7EBFF}
+</style>
+<div data-slot="world">
+  <div class="st" id="s0" style="top:250px">01&nbsp;&nbsp;<span class="R">Envoyez ce prompt sans le modifier.</span></div>
+  <div class="st" id="s1" style="top:302px">02&nbsp;&nbsp;<span class="R">Lisez la réponse, sans la corriger pour le moment.</span></div>
+</div><!--/world-->
+<div data-slot="shape">
+  <div class="L" id="Lblk">
+    <div class="a U" style="left:-740px;top:-80px;font-size:24px;color:#E9FF00">À copier dans une IA</div>
+    <div class="a" style="left:-740px;top:-36px;width:1400px;font-size:44px;line-height:56px;color:#fff"><span id="pr"></span><span id="cr" style="display:inline-block;width:4px;height:44px;background:#E9FF00;vertical-align:-6px;margin-left:4px"></span></div>
+  </div>
+  <div class="L" id="Lbox">
+    <div class="a" id="bf" style="left:0;top:0;box-sizing:border-box;border:2px solid #D6D6D6"></div>
+    <div class="a U" style="left:-760px;top:34px;font-size:28px;color:#0057FF">Notez deux pistes proposées</div>
+    <div class="a U" style="left:-760px;top:110px;font-size:26px">Piste 1</div><div class="pl" id="p0" style="left:-620px;top:118px"></div>
+    <div class="a U" style="left:-760px;top:180px;font-size:26px">Piste 2</div><div class="pl" id="p1" style="left:-620px;top:188px"></div>
+  </div>
+</div><!--/shape-->
+<script>
+HDR('a','Mission 01 / Test','Le prompt flou','Commencez sans donner de contexte. C\'est volontaire !','01');
+const P='« Aide-moi à trouver un sujet journalistique sur les adolescents. »';
+M.scene({W:1920,H:1080,bg:PA,T:8,intro:0.9,
+  SH:{blk:{w:1600,h:240,r:0,bg:INK,cam:1},box:{w:1600,h:270,r:0,bg:'#FFFFFF',cam:1}},
+  start:'blk',SEQ:[[5.3,'box']],
+  layers:[
+    {el:'Lblk',tin:0.9,tout:5.3,o:{din:0.05},update:t=>{typed($('pr'),P,t,1.3,3.0); $('cr').style.opacity=(t<3.05||Math.floor(t*2.4)%2==0)?1:0;}},
+    {el:'Lbox',tin:5.3,tout:null,anchor:'t',update:(t,g)=>{const f=$('bf').style; f.width=g.w+'px'; f.height=g.h+'px'; f.left=(-g.w/2)+'px';
+      [0,1].forEach(i=>$('p'+i).style.width=(1300*M.eio((t-5.8-0.5*i)/0.7)*(i?0.72:0.86))+'px');}},
+  ],
+  geom:(t,g)=>{g.cy=40; return g;},
+  extra:t=>{HDRA('a',t,0.1); rise($('s0'),t,3.4,5.1,0.4,20); rise($('s1'),t,3.8,5.1,0.4,20);}
+});
+</script>

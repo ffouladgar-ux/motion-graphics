@@ -1,0 +1,36 @@
+<title>05 Le contexte caché</title>
+<style>
+.rw{position:absolute;width:780px;height:104px;background:#E7EBFF}
+.rw::before{content:'';position:absolute;left:0;top:0;width:8px;height:104px;background:#0057FF}
+.rw .k{position:absolute;left:32px;top:16px;font-size:22px;color:#0057FF;text-transform:uppercase}
+.rw .v{position:absolute;left:32px;top:48px;font-size:31px;white-space:nowrap}
+</style>
+<div data-slot="world">
+  <div class="a" id="send" style="left:-800px;top:200px;width:1600px;height:150px;background:#0B0B0B">
+    <div class="a U" style="left:40px;top:30px;font-size:30px;color:#E9FF00">Envoyez votre prompt</div>
+    <div class="a R" style="left:40px;top:80px;font-size:32px;color:#fff;white-space:nowrap">Observez les nouvelles propositions. Gardez votre regard critique.</div>
+  </div>
+</div><!--/world-->
+<div data-slot="shape">
+  <div class="L" id="Lrows"><div id="rows"></div></div>
+  <div class="L" id="Lno">
+    <div class="a U" style="left:-760px;top:-52px;font-size:40px;line-height:52px">Interdit : demander à l'IA de rédiger le sujet,<br>le titre ou les questions d'interview.</div>
+  </div>
+</div><!--/shape-->
+<script>
+HDR('a','Mission 01 / Brief','Le contexte caché','Voici la situation réelle que vous aviez en tête.','03');
+HDR('b','Mission 01 / Action','Reprenez la main','Rédigez un nouveau prompt avec toutes les informations utiles.','04');
+const RW=[['Média','Local, destiné aux parents'],['Public','Adolescents de 12 à 15 ans'],['Sujet','Phénomène de société qui affecte leur quotidien'],['Terrain','Ancrage local indispensable'],['Délai','Une semaine'],['Sources','Adolescents et au moins un spécialiste'],['Objectif','Plusieurs pistes, pas un angle définitif']];
+$('rows').innerHTML=RW.map(([k,v],i)=>`<div class="rw" id="r${i}" style="left:${i<4?-800:20}px;top:${-240+(i%4)*120}px"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+const cy=M.track(120,[[5.5,0]]);
+M.scene({W:1920,H:1080,bg:PA,T:9.5,intro:null,
+  SH:{rows:{w:1600,h:480,r:0,bg:PA,cam:1},no:{w:1600,h:190,r:0,bg:YE,cam:1}},
+  start:'rows',SEQ:[[5.5,'no']],
+  layers:[
+    {el:'Lrows',tin:null,tout:5.5,update:t=>RW.forEach((_,i)=>rise($('r'+i),t,0.9+0.35*i,null,0.4,24))},
+    {el:'Lno',tin:5.5,tout:null},
+  ],
+  geom:(t,g)=>{g.cy=cy(t); if(t<5.5) g.op=1; return g;},
+  extra:t=>{HDRA('a',t,0.1,5.3); HDRA('b',t,5.6); rise($('send'),t,6.8,null,0.45,30);}
+});
+</script>

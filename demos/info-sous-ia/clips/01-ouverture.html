@@ -1,0 +1,23 @@
+<title>01 Ouverture</title>
+<style>
+#hero{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;transform-origin:0% 50%}
+</style>
+<div data-slot="shape">
+  <img id="hero" src="../assets/hero.jpg">
+  <div class="L" id="Ltag"><div class="row U" style="transform:translate(-50%,-50%);font-size:46px">L'info sous IA</div></div>
+</div><!--/shape-->
+<div data-slot="over">
+  <div class="a U" id="o1" style="left:-900px;top:-420px;font-size:54px;line-height:60px;color:#fff">IA &amp;</div>
+  <div class="a U" id="o2" style="left:-900px;top:-360px;font-size:54px;line-height:60px;color:#fff">Journalisme</div>
+  <div class="a" id="o3" style="left:-900px;top:-276px;width:220px;height:10px;background:#E9FF00"></div>
+  <div class="a U" id="o4" style="left:-900px;top:-244px;font-size:28px;color:#fff">Le workbook</div>
+</div><!--/over-->
+<script>
+M.scene({W:1920,H:1080,bg:INK,T:6.5,intro:0.15,
+  SH:{tag:{w:470,h:96,r:0,bg:YE,cam:1.6},hero:{w:1920,h:1202,r:0,bg:BL,cam:1.0}},
+  start:'tag',SEQ:[[1.5,'hero']],
+  layers:[{el:'Ltag',tin:0.15,tout:1.5,o:{din:0.05}}],
+  extra:(t,g)=>{const h=$('hero'),v=M.vis(t,1.5,null,{din:0,lin:0.4,blur:0}); h.style.opacity=t<1.5?0:v.o; h.style.transform=`scale(${(1.1-0.08*M.eo((t-1.5)/5)).toFixed(4)})`;
+    rise($('o1'),t,2.7); rise($('o2'),t,2.9); $('o3').style.width=(220*M.eio((t-3.2)/0.5))+'px'; rise($('o4'),t,3.5,null,0.4,20);}
+});
+</script>

@@ -1,0 +1,29 @@
+<title>06 Le duel</title>
+<div data-slot="world">
+  <div class="a" id="r1" style="left:-800px;top:-130px;width:760px;height:250px;background:#0B0B0B">
+    <div class="a U" style="left:44px;top:58px;font-size:58px;color:#E9FF00">Round 01</div>
+    <div class="a R" style="left:44px;top:140px;font-size:32px;color:#fff">Première réponse</div>
+  </div>
+  <div class="a U" id="q1" style="left:-800px;top:200px;font-size:34px;color:#0057FF">Pourquoi la deuxième réponse convient-elle mieux ?</div>
+  <div class="a R" id="q2" style="left:-800px;top:252px;font-size:28px;color:#6B6B6B;white-space:nowrap">(Ou pourquoi ne convient-elle pas mieux ?)</div>
+</div><!--/world-->
+<div data-slot="shape">
+  <div class="L" id="Lr2">
+    <div class="a U" style="left:-336px;top:-67px;font-size:58px;color:#fff">Round 02</div>
+    <div class="a R" style="left:-336px;top:15px;font-size:32px;color:#fff;white-space:nowrap">Deuxième réponse</div>
+  </div>
+</div><!--/shape-->
+<div data-slot="over">
+  <div class="a U" id="vs" style="left:-60px;top:-65px;width:120px;height:120px;line-height:120px;text-align:center;background:#E9FF00;font-size:52px">VS</div>
+</div><!--/over-->
+<script>
+HDR('a','Mission 01 / Duel','Prompt 1 vs prompt 2','Choisissez une proposition dans chacune des deux réponses.','05');
+const vs=M.track(0,[[1.75,1,[16,0.7]]]);
+M.scene({W:1920,H:1080,bg:PA,T:6.5,intro:1.1,
+  SH:{r2:{w:760,h:250,r:0,bg:BL,cam:1}},start:'r2',SEQ:[],
+  layers:[{el:'Lr2',tin:1.1,tout:null}],
+  geom:(t,g)=>{g.cx=420; g.cy=-5; return g;},
+  extra:t=>{HDRA('a',t,0.1); rise($('r1'),t,0.8,null,0.45,30); const k=vs(t); $('vs').style.transform=`scale(${Math.max(0,k).toFixed(4)}) rotate(${(-6*k).toFixed(2)}deg)`; $('vs').style.opacity=M.clamp(k*1.5);
+    rise($('q1'),t,2.6,null,0.4,20); rise($('q2'),t,2.9,null,0.4,20);}
+});
+</script>

@@ -1,0 +1,22 @@
+<title>08 Fin</title>
+<div data-slot="world">
+  <div class="a U" id="l0" style="left:-580px;top:-260px;font-size:130px;line-height:150px;color:#fff">L'IA propose.</div>
+  <div class="a U" id="k0" style="left:-360px;top:-150px;font-size:120px;line-height:112px;color:#fff">L'info</div>
+  <div class="a U" id="k1" style="left:-360px;top:-38px;font-size:120px;line-height:112px;color:#fff">sous</div>
+  <div class="a U" id="tg" style="left:-360px;top:120px;height:66px;line-height:66px;padding:0 24px;background:#0057FF;color:#fff;font-size:34px">Comprendre • Vérifier • Créer</div>
+  <div class="a U" id="ij" style="left:-360px;top:218px;font-size:30px;color:#BDBDBD">IA &amp; Journalisme</div>
+</div><!--/world-->
+<div data-slot="shape">
+  <div class="L" id="Lv"><div class="row U" style="transform:translate(-50%,-50%);font-size:120px">Vous enquêtez.</div></div>
+  <div class="L" id="Lia"><div class="row U" style="transform:translate(-50%,-50%);font-size:180px;color:#0057FF">IA</div></div>
+</div><!--/shape-->
+<script>
+const cx=M.track(0,[[3.2,230]]), cy=M.track(10,[[3.2,-35]]);
+M.scene({W:1920,H:1080,bg:INK,T:7.5,intro:1.0,
+  SH:{v:{w:1160,h:170,r:0,bg:YE,cam:1},ia:{w:250,h:224,r:0,bg:YE,cam:1}},
+  start:'v',SEQ:[[3.2,'ia']],
+  layers:[{el:'Lv',tin:1.0,tout:3.2,o:{din:0.05}},{el:'Lia',tin:3.2,tout:null}],
+  geom:(t,g)=>{g.cx=cx(t); g.cy=cy(t); return g;},
+  extra:t=>{rise($('l0'),t,0.3,3.0,0.5,60); rise($('k0'),t,3.4,null,0.45,40); rise($('k1'),t,3.55,null,0.45,40); wipe($('tg'),t,4.2); rise($('ij'),t,4.6,null,0.4,16);}
+});
+</script>

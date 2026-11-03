@@ -1,0 +1,22 @@
+<title>02 Le défi</title>
+<style>.big{position:absolute;left:-520px;font-size:124px;line-height:132px;color:#fff}</style>
+<div data-slot="world">
+  <div class="big U" id="w0" style="top:-400px">Et si l'IA</div>
+  <div class="big U" id="w1" style="top:-268px">devinait</div>
+  <div class="big U" id="w2" style="top:-136px">à votre</div>
+  <div class="big U" id="w3" style="top:-4px">place ?</div>
+  <div class="a R" id="sub" style="left:-520px;top:330px;font-size:32px;color:#BDBDBD;white-space:nowrap">Une consigne floue. Des choix invisibles.</div>
+</div><!--/world-->
+<div data-slot="shape">
+  <div class="L" id="Lm"><div class="row U" style="transform:translate(-50%,-50%);font-size:40px">L'IA propose. Vous enquêtez.</div></div>
+</div><!--/shape-->
+<script>
+const WT=[0.25,0.55,0.85,1.15];
+M.scene({W:1920,H:1080,bg:INK,T:6,intro:1.7,
+  SH:{rule:{w:340,h:14,r:0,bg:YE,cam:1},msg:{w:780,h:96,r:0,bg:YE,cam:1}},
+  start:'rule',SEQ:[[2.5,'msg']],
+  layers:[{el:'Lm',tin:2.5,tout:null}],
+  geom:(t,g)=>{g.cx=-520+g.w/2; g.cy=210; return g;},
+  extra:t=>{WT.forEach((w,i)=>rise($('w'+i),t,w,null,0.5,60)); rise($('sub'),t,3.6,null,0.4,20);}
+});
+</script>

@@ -1,0 +1,35 @@
+<title>07 Bravo</title>
+<style>
+.ur{position:absolute;left:-340px;width:680px;height:128px;background:#E7EBFF}
+.ur::before{content:'';position:absolute;left:0;top:0;width:8px;height:128px;background:#0057FF}
+.ur .n{position:absolute;left:30px;top:26px;font-size:62px;line-height:76px;color:#0057FF}
+.ur .h{position:absolute;left:140px;top:26px;font-size:36px;text-transform:uppercase}
+.ur .d{position:absolute;left:140px;top:74px;font-size:27px;white-space:nowrap}
+</style>
+<div data-slot="world">
+  <div class="a" id="lk" style="left:-820px;top:-370px;display:flex;width:max-content;white-space:nowrap"><div class="U" style="background:#0B0B0B;color:#fff;font-size:34px;height:64px;line-height:64px;padding:0 20px">L'info sous</div><div class="U" style="background:#E9FF00;color:#0057FF;font-size:40px;height:64px;line-height:64px;padding:0 16px">IA</div></div>
+  <div class="a U" id="b0" style="left:-820px;top:-280px;font-size:180px;line-height:200px;color:#fff">Bravo !</div>
+  <div class="a U" id="b1" style="left:-820px;top:-60px;font-size:56px;color:#E9FF00">Mission accomplie</div>
+  <div class="a" id="b2" style="left:-820px;top:24px;height:8px;background:#E9FF00"></div>
+  <div class="a U" id="b3" style="left:-820px;top:70px;font-size:46px;line-height:58px;color:#fff">Vous avez repris<br>le contrôle du prompt.</div>
+  <div class="a" id="rf" style="left:-820px;top:250px;width:780px;height:130px;background:#0B0B0B">
+    <div class="a U" style="left:34px;top:24px;font-size:28px;color:#E9FF00">Le bon réflexe</div>
+    <div class="a R" style="left:34px;top:70px;font-size:28px;color:#fff;white-space:nowrap">Préciser, vérifier, puis décider par vous-même.</div>
+  </div>
+</div><!--/world-->
+<div data-slot="shape">
+  <div class="L" id="Lp">
+    <div class="a U" style="left:-340px;top:40px;font-size:34px">Ce que vous avez débloqué</div>
+    <div class="ur" id="u0" style="top:116px"><div class="n">01</div><div class="h">Repérer</div><div class="d R">les informations implicites</div></div>
+    <div class="ur" id="u1" style="top:264px"><div class="n">02</div><div class="h">Guider</div><div class="d R">une IA sans lui déléguer votre angle</div></div>
+    <div class="ur" id="u2" style="top:412px"><div class="n">03</div><div class="h">Garder</div><div class="d R">votre regard critique de journaliste</div></div>
+  </div>
+</div><!--/shape-->
+<script>
+M.scene({W:1920,H:1080,bg:BL,T:8.5,intro:2.5,
+  SH:{p:{w:760,h:580,r:0,bg:'#FFFFFF',cam:1}},start:'p',SEQ:[],
+  layers:[{el:'Lp',tin:2.5,tout:null,anchor:'t',update:t=>[0,1,2].forEach(i=>rise($('u'+i),t,3.1+0.4*i,null,0.4,24))}],
+  geom:(t,g)=>{g.cx=440; g.cy=0; return g;},
+  extra:t=>{wipe($('lk'),t,0.1); rise($('b0'),t,0.3,null,0.55,80); rise($('b1'),t,0.8); $('b2').style.width=(460*M.eio((t-1.1)/0.5))+'px'; rise($('b3'),t,1.4); rise($('rf'),t,5.0,null,0.45,30);}
+});
+</script>
