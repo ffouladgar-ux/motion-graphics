@@ -1,8 +1,9 @@
 """Teaser soundtrack: synthesized hits/pops on every slap + a light 120 BPM beat. Mux onto the video.
-usage: python3 mix.py <video.mp4> <out.mp4> [--no-beat]"""
+usage: python3 mix.py <video.mp4> <out.mp4> [--no-beat] [--vo DIR]   (DIR holds vo_N.wav for vo_lines.LINES)"""
 import sys, subprocess, pathlib, numpy as np
 from sfx import SR, rng, whoosh, pop, tick, thud, hit, chime, lp, env
 VID, OUT = sys.argv[1:3]; BEAT='--no-beat' not in sys.argv
+VO=sys.argv[sys.argv.index('--vo')+1] if '--vo' in sys.argv else None
 T=float(subprocess.check_output(['ffprobe','-v','error','-show_entries','format=duration','-of','csv=p=0',VID])); N=int(T*SR)
 S=[0,4.5,8,12,21.5,27.5,31.5]   # scene starts (hard cuts)
 EV=[]; at=lambda s,t,x: EV.append((S[s]+t,x)); sw=lambda g=0.4: whoosh(0.3,g,4500)
@@ -31,6 +32,14 @@ if BEAT:
         i=int(t*SR); bt[i:i+len(kick)]+=kick[:len(bt)-i]*(0.55 if k%2 else 0.8)
         j=int((t+0.25)*SR); bt[j:j+len(hat)]+=hat[:len(bt)-j]
     fade=np.clip((T-np.arange(len(bt))/SR-1.0)/1.5,0,1); mix=fx+0.32*bt*fade
+if VO:
+    from vo_lines import LINES
+    vo=np.zeros_like(mix); act=np.zeros_like(mix)
+    for i,(t0,_,_) in enumerate(LINES):
+        raw=subprocess.check_output(['ffmpeg','-loglevel','error','-i',f'{VO}/vo_{i}.wav','-af','highpass=f=100,acompressor=threshold=-20dB:ratio=4:attack=3:release=60,equalizer=f=3000:t=q:w=1:g=3','-ac','1','-ar',str(SR),'-f','f32le','-'])
+        v=np.frombuffer(raw,np.float32); a=int(t0*SR); vo[a:a+len(v)]+=v[:len(vo)-a]; act[a:a+len(v)]=1
+    vo/=np.abs(vo).max()+1e-9; k=int(0.12*SR); duck=np.convolve(act,np.ones(k)/k,'same')
+    mix=0.95*vo+mix*(0.75-0.4*duck)/max(1e-9,np.abs(mix).max())
 mix=mix[:N]; mix/=max(1.0,np.abs(mix).max()/0.95)
 tmp=pathlib.Path(OUT).with_suffix('.raw'); mix.astype(np.float32).tofile(tmp)
 subprocess.run(['ffmpeg','-loglevel','error','-y','-i',VID,'-f','f32le','-ar',str(SR),'-ac','1','-i',str(tmp),'-filter_complex','[1:a]loudnorm=I=-16:TP=-2.5:LRA=11,aresample=48000,pan=stereo|c0=c0|c1=c0[a]',

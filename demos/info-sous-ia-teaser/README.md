@@ -14,7 +14,7 @@ Brand, from the official "DA TYPO/couleurs" guide: blue `#0453E1`, yellow `#E9FF
 | 06 | L'IA propose. Vous enquêtez. | 4 s |
 | 07 | Logo · 9 • 10 • 11 février 2027 · À vous de jouer | 5.5 s |
 
-Hard cuts on a 120 BPM grid. Soundtrack: synthesized hits/pops on every sticker + a light beat (`audio/mix.py`, `--no-beat` for effects only).
+Hard cuts on a 120 BPM grid. Soundtrack: synthesized hits/pops on every sticker + a light beat (`audio/mix.py`, `--no-beat` for effects only), and an optional high-energy French voiceover (`--vo DIR`): 11 short lines in `audio/vo_lines.py`, each timed to its sticker, voiced with edge-tts `fr-FR-RemyMultilingualNeural` (rate +12 %, pitch +6 Hz), music and effects ducked under the voice.
 
 `assets/bienvenue.jpg` and `assets/journal.jpg` (project artwork from the team Drive) are not committed; this repo is public.
 
