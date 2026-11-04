@@ -1,4 +1,5 @@
-// Day 2 — Make AI work your way. Université Côte d'Azur (Cannes campus). v1.
+// Day 2 — Make AI work your way. Université Côte d'Azur (Cannes campus). v2.
+// v2: Fadi's edits — Day 1 parts 5–6 (tokens, first prompting) moved here as parts 0.5–0.6, his custom instructions, a new Part 8.
 // Built from Fadi's Simplon decks (02#109–117, 02#132, 01#70, 09#83, 09#106) and the approved Day 2 plan.
 // Notes: "•" lines are talking points.
 const { Deck } = require("./engine/kit");
@@ -33,68 +34,389 @@ deck.cover({
   answer: { label: "A master prompt", note: "yours, tested, reusable" },
   sub: "Today: personalise your AI, connect it, and build your first master prompt.",
   notes: notes(
-    "Welcome back. Yesterday: what AI is and how it predicts. Today: how to make it work for you, every time.",
+    "Welcome back. Last session: what AI is and how it learns. Today: how to make it work for you, every time.",
     "Click by click: no more retyping and starting from zero in every chat, no more copying other people's prompts.",
     "The answer: a master prompt, a prompt of your own that you test once and reuse forever. It is the core idea of the whole course.",
   ),
 });
 
-deck.points({
+deck.columns({
   bg: "blue",
   title: "Today's *journey*",
-  items: [
-    { label: "Personalise your AI", note: "instructions, memory, projects" },
-    { label: "Connect it", note: "API, MCP, connectors" },
-    { label: "The ODS framework", note: "Objective, Data, Skill" },
-    { label: "The funnel", note: "my way of prompting" },
-    { label: "Structures, deeper", note: "role, context, result, splitting" },
-    { label: "References", note: "show an example" },
-    { label: "The master prompt", note: "build, test, version" },
-    { label: "Responsible use", note: "data, energy, integrity" },
+  columns: [
+    { title: "Finish Day 1", sub: "Parts 0.5–0.6", color: "7B3FBF", items: ["0.5 · Tokens and prediction", "0.6 · First steps in prompting"] },
+    { title: "Make it yours", sub: "Parts 1–4", color: "0EA5E9", items: ["1 · Personalise your AI", "2 · Connect it", "3 · The ODS framework", "4 · The funnel"] },
+    { title: "Make it reliable", sub: "Parts 5–9", color: "10B981", items: ["5 · Structures, deeper", "6 · References", "7 · The master prompt", "8 · Hack master prompts", "9 · Use AI responsibly"] },
   ],
   notes: notes(
-    "We start with a 5-question recap of Day 1, then eight parts.",
-    "Morning: parts 1 to 4. Afternoon: parts 5 to 8. Every part ends with an exercise.",
-    "By tonight, everyone leaves with a personalised AI and a first master prompt that works.",
+    "We start with a 6-question recap of Day 1, then we finish what we didn't have time for last week: parts 0.5 and 0.6.",
+    "Then the Day 2 parts: make the AI yours (personalise, connect, ODS, the funnel), then make it reliable (structures, references, the master prompt, responsible use).",
+    "Every part ends with an exercise. By tonight, everyone leaves with a personalised AI and a first master prompt that works.",
   ),
 });
 
 deck.grid({
-  bg: "purple",
+  bg: "coral",
   title: "Recap quiz: *Day 1*",
   items: [
     { label: "AI learns patterns, then it…?", answer: "Predicts", answerColor: "FFE066" },
     { label: "Gmail spam filter: which circle?", answer: "Machine learning", answerColor: "74C0FC" },
     { label: "The next word: regression or classification?", answer: "Classification", answerColor: "FFC93C" },
-    { label: "AI reads words or…?", answer: "Tokens", answerColor: "8CE99A" },
+    { label: "Face ID unlocks your phone: which circle?", answer: "Deep learning", answerColor: "B197FC" },
     { label: "Garbage in…?", answer: "Garbage out", answerColor: "F783AC" },
-    { label: "A reasoning model, before it answers?", answer: "Thinks first", answerColor: "B197FC" },
+    { label: "Exam grade: regression or classification?", answer: "Regression", answerColor: "74C0FC" },
   ],
   cols: 3,
   reveal: "answers",
   notes: notes(
     "15 minutes. Read each of the 6 questions as it lands; students write their answers on paper or in Wooclap. Don't confirm yet.",
     "Once all six are on screen, one click reveals all the answers.",
-    "1: AI learns patterns from examples, then predicts (Day 1: \"It learns, then guesses\"). 2: the spam filter learns from data, so machine learning. 3: the next word is one choice out of a list of about 100,000 tokens, so classification. 4: tokens, pieces of words. 5: garbage out: bad data gives bad predictions. 6: it thinks first: a hidden draft where it breaks the problem into steps and checks itself.",
+    "1: AI learns patterns from examples, then predicts (Day 1: \"It learns, then guesses\"). 2: the spam filter learns from data, so machine learning. 3: the next word is one choice out of a list of about 100,000 tokens, so classification. 4: Face ID recognises faces in images, so deep learning. 5: garbage out: bad data gives bad predictions. 6: a grade is a number, so regression.",
     "Anyone below 4 out of 6: no stress, everything comes back today.",
+    "Only topics we covered last week: tokens and prompting come next, in parts 0.5 and 0.6.",
   ),
 });
 
 const TAPENADE = [
   { tag: "Role", text: "You are an expert in marketing and communication.", color: C.role },
-  { tag: "Context", text: "You work for a company that makes gourmet products, including a wide range of tapenades.", color: C.context },
-  { tag: "Objective", text: "Write one post for each social network to launch our new organic green olive and almond tapenade.", color: C.objective },
+  { tag: "Context", text: "You work for a gourmet food company known for its tapenades.", color: C.context },
+  { tag: "Objective", text: "Write one post per social network to launch our organic almond tapenade.", color: C.objective },
   { tag: "Expected result", text: "The goal is to turn readers into customers.", color: C.result },
-  { tag: "Constraints", text: "Each post must mention the ingredients, their Provençal origin and the artisanal process.", color: C.constraints },
+  { tag: "Constraints", text: "Each post mentions the ingredients, their Provençal origin and the craft.", color: C.constraints },
   { tag: "Format", text: "100 to 150 words per post, in a friendly tone.", color: C.format },
 ];
+
+// ── Tokens and prediction ─────────────────────────────────────────────────
+deck.statement({ bg: "purple", tag: "Part 0.5", lines: ["Tokens and *prediction*"], notes: notes("How a chatbot reads your text, and what it really does with it.") });
+
+deck.tokens({
+  bg: "teal",
+  title: "AI reads *tokens*, not words",
+  rows: [
+    { label: "lowercase", tokens: ["ici", " c", "'est", " Marseille"] },
+    { label: "one capital letter", tokens: ["I", "ci", " c", "'est", " Marseille"] },
+    { label: "English", tokens: ["Hello", ",", " how", " are", " you", "?"] },
+  ],
+  link: { text: "Try it: platform.openai.com/tokenizer", url: "https://platform.openai.com/tokenizer" },
+  notes: notes(
+    "A token is a piece of text: a word, part of a word, or punctuation. Each colour = one token.",
+    "Row 1: \"ici c'est Marseille\" = 19 characters, 4 tokens.",
+    "Row 2: the same sentence with a capital I = 5 tokens. One capital letter changes how it is cut. The AI doesn't see words; it sees pieces.",
+    "Row 3: \"Hello, how are you?\" also 19 characters, 6 tokens (every word and punctuation mark is one token in English). Check it live before class: tokenizers change with models.",
+    "Why it matters: you pay and you are limited in tokens, not words. Roughly 1 token ≈ 4 characters in English; French usually needs more tokens.",
+    "Last click: the link. Open it live (it's clickable in slide show) and type a student's name.",
+  ),
+});
+
+deck.vectors({
+  bg: "blue",
+  title: "From words to *numbers*",
+  sentence: "The dog eats its kibble",
+  rows: [
+    { token: "The", vector: "[67, -78, -56, 1, 0, 6]" },
+    { token: "dog", vector: "[-79, 8, 56, 8, 20, 5]" },
+    { token: "eats", vector: "[47, 78, 12, -89, 2, 7]" },
+    { token: "its", vector: "[87, 13, -85, -17, 7, 6]" },
+    { token: "kibble", vector: "[-34, 4, 6, 46, -21, 5]" },
+  ],
+  notes: notes(
+    "Step 1: the sentence is cut into tokens.",
+    "Step 2: each token becomes a vector, a list of numbers that places it on a map of meaning.",
+    "These numbers are made up for the example. Real vectors have thousands of numbers.",
+    "Words with close meanings get close numbers: \"dog\" sits near \"puppy\" and \"cat\", far from \"invoice\".",
+    "From here on, the AI only calculates with numbers. It never \"reads\" like we do.",
+  ),
+});
+
+deck.question({
+  bg: "coral",
+  title: "It only predicts the next word.",
+  underline: "next",
+  tag: "Finish the sentence",
+  question: "The cat sat on the…",
+  notes: notes("Let the room finish the sentence. Everyone says \"mat\" or \"sofa\". That's exactly what the AI does: it picks the most likely next word, then the next, then the next."),
+});
+
+deck.cards({
+  bg: "blue",
+  title: "Every next word is a *bet*",
+  cards: [
+    { kicker: "VERY LIKELY", label: "mat" },
+    { kicker: "LIKELY", label: "sofa" },
+    { kicker: "POSSIBLE", label: "floor" },
+    { kicker: "UNLIKELY", label: "moon" },
+  ],
+  stress: 0,
+  footer: "Your context changes the odds",
+  notes: notes(
+    "The model gives every possible next word a probability, then picks one, usually among the most likely.",
+    "That's why the same question can give different answers: a bit of chance is built in (called \"temperature\").",
+    "Footer: if the sentence started with \"In the rocket, the cat sat on the…\", \"moon\" becomes likely. Context changes the odds.",
+  ),
+});
+
+deck.pair({
+  bg: "amber",
+  title: "Context *steers* the answer",
+  left: { kicker: "Same word", text: "\"bank\"" },
+  line: "A river nearby, or money talk?",
+  right: { text: "Your context picks the *river* bank or the *money* bank." },
+  notes: notes(
+    "\"I sat on the bank and watched the water\" vs \"I need to call my bank about my card\".",
+    "The transformer's \"attention\" looks at the other words to decide which meaning applies.",
+    "The more context you give, the better it guesses what you mean.",
+  ),
+});
+
+deck.contrast({
+  bg: "purple",
+  title: "Is it *intelligent*?",
+  tile: { big: "No", small: "it predicts" },
+  wrong: { kicker: "What it looks like", text: "It *understands* me." },
+  right: { kicker: "What really happens", text: "It calculates the most likely next word." },
+  notes: notes(
+    "Back to the morning question: smart, or very good at guessing?",
+    "It sounds like it understands because it learned from billions of human texts.",
+    "But it has no intention, no experience, no idea if it's true. That's why it can invent facts with confidence (\"hallucinations\").",
+  ),
+});
+
+deck.cards({
+  bg: "teal",
+  title: "A classic model answers *at once*",
+  cards: [
+    { kicker: "STEP 1", label: "You ask", note: "your prompt" },
+    { kicker: "STEP 2", label: "Word by word", note: "each word is a new bet" },
+    { kicker: "STEP 3", label: "No going back", note: "it can't rewrite a word" },
+  ],
+  footer: "Fast, but it never reconsiders",
+  notes: notes(
+    "A classic chat model (like the first ChatGPT) starts answering immediately.",
+    "It writes one word at a time, each word a bet based on the words before.",
+    "Once a word is written, it can't go back. If it starts down a wrong path, it keeps going and justifies it.",
+    "Example: ask a tricky maths or logic question; a classic model often answers fast and wrong.",
+  ),
+});
+
+deck.checklist({
+  bg: "coral",
+  title: "A reasoning model *thinks first*",
+  lead: "First, a hidden draft:",
+  items: ["Breaks it into steps", "Tries, then checks", "Fixes, then answers"],
+  side: { big: "Still prediction. Just more of it." },
+  notes: notes(
+    "Newer \"reasoning\" models (OpenAI o-series and GPT-5 Thinking, Claude with extended thinking, Gemini Thinking, DeepSeek-R1) write a draft you usually don't see before answering.",
+    "In that draft they split the problem into steps, try an answer, check it, and correct their mistakes.",
+    "You can see it: \"Thought for 12 seconds\", with a summary of the reasoning.",
+    "Side card: it is still next-word prediction, just a lot more of it. It is slower and costs more, but it's much better at maths, code and planning.",
+    "Tip: use reasoning mode for hard problems, the fast mode for simple writing.",
+  ),
+});
+
+// ── The chat tools ────────────────────────────────────────────────────────
+deck.gallery({
+  bg: "blue",
+  title: "Not all chat tools are *born equal*",
+  items: [
+    { image: img("l_chatgpt.png"), label: "ChatGPT", note: "OpenAI" },
+    { image: img("l_claude.png"), label: "Claude", note: "Anthropic" },
+    { image: img("l_gemini.png"), label: "Gemini", note: "Google" },
+    { image: img("l_copilot.png"), label: "Copilot", note: "Microsoft" },
+  ],
+  footer: "All have a free version",
+  notes: notes(
+    "ChatGPT: the most used, good all-rounder.",
+    "Claude: strong at writing, long documents and code.",
+    "Gemini: built into Google (Docs, Gmail, Drive).",
+    "Copilot: built into Microsoft (Word, Excel, Teams); students often have it free with their university account.",
+    "They were not all born equal: each comes from a different company with different strengths. Pick by task, not by habit.",
+    "All four have a free version. We use several during the week and compare.",
+  ),
+});
+
+deck.gallery({
+  bg: "purple",
+  title: "Also worth *knowing*",
+  items: [
+    { image: img("l_mistral.png"), label: "Le Chat", note: "Mistral AI, French" },
+    { image: img("l_grok.jpg"), label: "Grok", note: "xAI, built into X" },
+    { image: img("l_perplexity.png"), label: "Perplexity", note: "search with sources" },
+    { image: img("l_deepseek.png"), label: "DeepSeek", note: "China, open models" },
+    { image: img("l_qwen.png"), label: "Qwen", note: "Alibaba, open models" },
+  ],
+  footer: "Mind where your data goes",
+  notes: notes(
+    "Le Chat by Mistral AI: the French champion, based in Paris, fast and GDPR-friendly. The French state's choice: France Travail partnered with Mistral in 2025, and the armed forces ministry signed a framework agreement in January 2026.",
+    "Grok by xAI (Elon Musk): built into X, with access to live posts. A major player; also the most controversial on content moderation.",
+    "Perplexity: an AI search engine that cites its sources. Good for research.",
+    "DeepSeek and Qwen: Chinese models, very strong and open (anyone can download them). Data from their apps is stored in China.",
+    "Footer: never paste personal or confidential data (yours, your employer's, your classmates') into a free tool. GDPR applies.",
+  ),
+});
+
+// ── A first look at prompting ─────────────────────────────────────────────
+deck.statement({ bg: "teal", tag: "Part 0.6", lines: ["First steps in", "*prompting*"], notes: notes("Prompt engineering = the art of writing instructions for an AI. It's the skill we build all week.") });
+
+deck.contrast({
+  bg: "coral",
+  title: "Good prompt, *bad prompt*",
+  tile: { big: "?", small: "Which one works?" },
+  wrong: { kicker: "Bad prompt", text: "Write a post about our *tapenade.*" },
+  right: { kicker: "Good prompt", text: "Food marketer: 3 Instagram posts, organic tapenade, 100 words, friendly." },
+  notes: notes(
+    "Before showing anything, ask: what makes a prompt good or bad? Collect 3–4 answers.",
+    "Bad prompt: no role, no audience, no goal, no format. The AI fills the gaps with the most average answer.",
+    "Good prompt: a role, a precise task, a number, a format and a tone. Same AI, much better result.",
+    "Optional: run both live in ChatGPT and compare.",
+  ),
+});
+
+deck.cards({
+  bg: "blue",
+  title: "Three *essentials*",
+  cards: [
+    { kicker: "1 · CLARITY", label: "Clear, precise", note: "Why: vague in, vague out" },
+    { kicker: "2 · CONTEXT", label: "Give context", note: "Why: it knows nothing about you" },
+    { kicker: "3 · INSTRUCTIONS", label: "Say it plainly", note: "Why: it can't read your mind" },
+  ],
+  notes: notes(
+    "Clarity and precision: simple sentences, no ambiguity, be specific. A vague request gets a vague, generic answer.",
+    "Context: the subject, the tone you want, the audience. The AI starts from zero every time; it doesn't know you, your class or your project.",
+    "Explicit instructions: say exactly what you expect (length, format, steps). It won't guess what you didn't write.",
+  ),
+});
+
+deck.points({
+  bg: "purple",
+  title: "Five steps to a *good prompt*",
+  items: [
+    { label: "Define your objectives", note: "what for? what result? which format, style, language?" },
+    { label: "Give context", note: "who you are, what you want, for whom, for what use" },
+    { label: "Analyse and check", note: "think critically: verify the facts, rephrase if it's off" },
+    { label: "Refine and discuss", note: "guide it, add examples, go back, split into steps" },
+    { label: "Make it yours", note: "it's never perfect: add your value, then put it to use" },
+  ],
+  notes: notes(
+    "1. Objectives: what will you use it for? Do you know what you want at the end? Any format, style or language requirements?",
+    "2. Context: the more context, the more precise the answer. Who are you, what do you want, for whom, why, at what level?",
+    "3. Analyse and check: you need to know enough about the topic to judge the answer, or check other sources. Rephrase if it's far off; dig deeper if it's good.",
+    "4. Refine and discuss: talk to it like an assistant who needs material and feedback. Add details, give examples, go back, validate, split into steps.",
+    "5. Make it yours: the result is never perfect. Add your own value and be creative in how you use it.",
+  ),
+});
+
+deck.colorText({
+  bg: "blue",
+  title: "The *structured* prompt",
+  parts: TAPENADE,
+  notes: notes(
+    "A structured prompt: six parts written as one normal paragraph. A good prompt reads like a clear brief to a colleague.",
+    "The colours are a checklist: before you send a prompt, can you find each colour in it?",
+  ),
+});
+
+deck.decompose({
+  bg: "teal",
+  title: "A structured prompt, *piece by piece*",
+  parts: TAPENADE,
+  notes: notes(
+    "Read each part aloud as it appears. After each, ask: what would the answer look like without this part?",
+    "Role: sets the expertise and vocabulary. Context: who we are. Objective: the task. Expected result: why we do it. Constraints: what must be in it. Format: length and tone.",
+  ),
+});
+
+deck.cards({
+  bg: "amber",
+  title: "Prompt *structures* to remember",
+  cards: [
+    { kicker: "SIMPLE", label: "RTF", note: "Role, Task, Format" },
+    { kicker: "PRECISE", label: "RTCE", note: "Role, Task, Constraints, Examples" },
+    { kicker: "COMPLETE", label: "CO-STAR", note: "Context, Objective, Style, Tone, Audience, Response" },
+  ],
+  notes: notes(
+    "Three ready-made structures, from quick to complete.",
+    "RTF for everyday requests. RTCE when you need precision; examples are the most powerful part. CO-STAR for anything public-facing.",
+    "They all contain the same colours as our tapenade prompt. Pick one; the structure matters more than which one.",
+  ),
+});
+
+deck.points({
+  bg: "coral",
+  title: "Exercise: *improve* your last prompt",
+  items: [
+    { label: "Open the last prompt you wrote", note: "in any chat tool" },
+    { label: "Rebuild it with a structure", note: "the 6 colours, RTF, RTCE or CO-STAR" },
+    { label: "Make it better", note: "add context, constraints and a format" },
+    { label: "Test it", note: "same tool, in a new chat" },
+    { label: "Share what changed", note: "in the answer, and in how it reasoned" },
+  ],
+  notes: notes(
+    "20 minutes, alone, then share in pairs.",
+    "No old prompt? Use: \"Help me prepare for a job interview.\"",
+    "New chat matters: the AI remembers the conversation, so a fresh chat gives a fair comparison.",
+    "Debrief: 3 volunteers read before and after. Ask: what changed in the output? In the reasoning (did it ask questions, plan, check)?",
+  ),
+});
+
+deck.decompose({
+  bg: "teal",
+  title: "Inside a *master prompt*",
+  parts: [
+    { tag: "Expert role", text: "You are a recruitment and ATS expert (Taleez, Flatchr, Recruitee…) who knows their keyword logic.", color: "FFE066" },
+    { tag: "Mission", text: "Optimise the Experience section of a CV for one job ad, so it passes ATS filters.", color: "8CE99A" },
+    { tag: "Inputs first", text: "First ask for the current CV and the full job ad.", color: "FFA94D" },
+    { tag: "Numbered steps", text: "Find the ad's 30 key words, find the CV's gaps, then rewrite.", color: "74C0FC" },
+    { tag: "Measurable rules", text: "6 lines per job, 85–90 characters each, one keyword per line, 40 lines max.", color: "F783AC" },
+    { tag: "Deliverables", text: "The new section, the 30 keywords and a 5-line explanation.", color: "B197FC" },
+  ],
+  notes: notes(
+    "This is my recruiting master prompt (the ATS CV prompt from the Simplon job-search course), summarised in English. The full English text is in the students' shared doc.",
+    "ATS = Applicant Tracking System: software that filters CVs by keywords before a human reads them.",
+    "What makes it \"mega\": an expert role with precise knowledge, inputs requested first, numbered steps, rules you can measure (characters, lines, numbers) and a clear list of deliverables.",
+    "Reverse engineering: if we keep the shape and remove the CV topic, we get a recipe for any master prompt. Next slide.",
+  ),
+});
+
+deck.decompose({
+  bg: "blue",
+  title: "The master prompt *generator*",
+  parts: [
+    { tag: "Role", text: "You are an expert prompt engineer who builds reusable master prompts.", color: "FFE066" },
+    { tag: "Mission", text: "Write a master prompt for the task I describe, one I can reuse every time.", color: "8CE99A" },
+    { tag: "Ask first", text: "First ask me 5 questions: task, audience, inputs, result, limits.", color: "FFA94D" },
+    { tag: "Structure", text: "Include: role, mission, inputs, numbered steps, rules, deliverables.", color: "74C0FC" },
+    { tag: "Measurable", text: "Turn every rule into numbers or checklists. End with a self-check step.", color: "F783AC" },
+    { tag: "Format", text: "One copy-ready block, then 3 lines on why it works.", color: "B197FC" },
+  ],
+  notes: notes(
+    "The same anatomy, turned into a machine that writes mega prompts for any task.",
+    "Demo: paste it into ChatGPT or Claude, answer its 5 questions for \"prepare me for a job interview at L'Oréal\", and show the master prompt it produces.",
+    "The full text is in the file master_prompt_generator.md; share it with the students now.",
+    "We use it in Part 7 to build everyone's personal master prompt.",
+  ),
+});
+deck.points({
+  bg: "amber",
+  title: "Testing: *prompt generators*",
+  items: [
+    { label: "Try an online generator", note: "feedough.com/ai-prompt-generator", url: "https://www.feedough.com/ai-prompt-generator/" },
+    { label: "Build a master prompt to write the prompt", note: "\"Write me the best prompt to…\"" },
+    { label: "Compare with your improved prompt", note: "which answer is better, and why?" },
+  ],
+  notes: notes(
+    "15 minutes. The link is clickable in slide show.",
+    "Second option: use the master prompt generator (previous slide) to write the prompt. The AI is good at writing prompts for itself.",
+    "Compare: generator vs their own improved prompt. Usually the best is a mix: the generator's structure plus their own context.",
+  ),
+});
+
 
 deck.colorText({
   bg: "teal",
   title: "Recap: the *six colours*",
   parts: TAPENADE,
   notes: notes(
-    "Yesterday's tapenade prompt. Each colour is one part of a good prompt: role, context, objective, expected result, constraints, format.",
+    "The tapenade prompt we just built. Each colour is one part of a good prompt: role, context, objective, expected result, constraints, format.",
     "Ask: which colour do you forget most often? Usually context and format.",
     "We use these colours all week as a checklist.",
   ),
@@ -110,7 +432,7 @@ deck.cards({
   ],
   footer: "Today we go deeper",
   notes: notes(
-    "The three ready-made structures from yesterday. Quick show of hands: who used one since yesterday?",
+    "The three ready-made structures from part 0.6. Quick check: which one would you use for an email to a teacher?",
     "Today we don't learn new acronyms. We learn to personalise the AI, connect it, and turn a good prompt into a master prompt.",
   ),
 });
@@ -138,15 +460,16 @@ deck.columns({
   bg: "teal",
   title: "Where to find it",
   columns: [
-    { title: "ChatGPT", sub: "OpenAI", color: "10A37F", items: ["Custom instructions", "Memory", "Projects", "Custom GPTs"] },
+    { title: "ChatGPT", sub: "OpenAI", color: "10A37F", items: ["Custom instructions", "Memory", "Projects", "Custom GPTs (soon to be plugins)"] },
     { title: "Claude", sub: "Anthropic", color: "D97757", items: ["Profile preferences", "Memory", "Projects"] },
-    { title: "Gemini", sub: "Google", color: "4285F4", items: ["Instructions for Gemini", "Memory", "Gems"] },
+    { title: "Gemini", sub: "Google", color: "4285F4", items: ["Instructions for Gemini", "Memory", "Gems (soon to be skills)"] },
   ],
   notes: notes(
     "Each heading lands, then where personalisation lives in that tool.",
     "ChatGPT: Settings → Personalization for custom instructions and memory; Projects in the sidebar; custom GPTs in the GPTs section.",
     "Claude: Settings for your profile preferences and memory; Projects in the sidebar.",
     "Gemini: Settings for instructions and memory; Gems are custom assistants with their own instructions.",
+    "Changing now: OpenAI retires custom GPTs on 11 December 2026 and replaces them with plugins (OpenAI help centre, \"Custom GPT retirement and migration FAQ\"). Google starts turning Gems into Skills on 17 November 2026 (9to5Google, September 2026).",
     "Menu names move every few months and guides disagree. Open each tool and check the exact names before class.",
   ),
 });
@@ -183,6 +506,39 @@ deck.points({
   ),
 });
 
+
+deck.question({
+  bg: "purple",
+  title: "Want my custom instructions?",
+  underline: "my",
+  tag: "Disclaimer: it is brutal",
+  question: "Fed up with an AI that always agrees with you?",
+  notes: notes(
+    "Only try it if you are fed up with the AI agreeing with you: my own custom instructions turn it into a brutally honest advisor.",
+    "Disclaimer: it is brutal. It will challenge your thinking, not flatter you.",
+    "Next slide: the prompt, part by part. The full text is in the students' shared doc, ready to copy.",
+  ),
+});
+
+deck.decompose({
+  bg: "teal",
+  title: "Copy my *custom instructions*",
+  parts: [
+    { tag: "Role", text: "Act as my brutally honest, high-level advisor and mirror.", color: C.role },
+    { tag: "Constraints", text: "Don't validate me. Don't soften the truth. Don't flatter.", color: C.constraints },
+    { tag: "Objective", text: "Challenge my thinking, question my assumptions, expose my blind spots.", color: C.objective },
+    { tag: "Call it out", text: "Point out excuses, self-deception, wasted time and the opportunity cost.", color: C.context },
+    { tag: "Expected result", text: "A precise, prioritized plan: what to change in my thoughts, actions, mindset.", color: C.result },
+    { tag: "Format", text: "Ask me clarifying questions one by one, then answer from what I told you.", color: C.format },
+  ],
+  notes: notes(
+    "My own custom instructions, shown with the six colours: the same anatomy as any good prompt.",
+    "The slide shortens each part. The full text (1,112 characters, fits ChatGPT's free custom-instructions limit) is in the students' shared doc.",
+    "Paste it in Settings → custom instructions, or in a project's instructions for one topic.",
+    "Warn them: honest is not the same as right. The AI only knows what you tell it; judge its advice yourself.",
+  ),
+});
+
 deck.points({
   bg: "blue",
   title: "Exercise: a *project* for one course",
@@ -197,7 +553,7 @@ deck.points({
     "20 minutes, alone.",
     "The syllabus or the course slides are ideal: the project now answers from your course, not from the whole internet.",
     "Good test questions: \"What are the 3 key ideas of week 2?\", \"Quiz me on chapter 3\", \"What will the exam probably ask?\"",
-    "We reuse this project tomorrow when we build bots.",
+    "We reuse this project next session when we build bots.",
   ),
 });
 
@@ -319,13 +675,13 @@ deck.points({
   ],
   notes: notes(
     "10 minutes, alone, on paper or in a doc. Keep it: this task becomes your master prompt in Part 7.",
-    "Use one of the 3 tasks from yesterday's homework if you wrote them.",
+    "Use one of the 3 tasks from the Day 1 homework if you wrote them.",
     "Check in pairs: can your partner tell what a good result looks like from your O?",
   ),
 });
 
 // ── Part 4: The funnel ────────────────────────────────────────────────────
-deck.statement({ bg: "purple", tag: "Part 4", lines: ["*My way:*", "the funnel"], notes: notes("My own way of prompting, from my toolbox. Yesterday's teaser, now done properly.") });
+deck.statement({ bg: "purple", tag: "Part 4", lines: ["*My way:*", "the funnel", "(social prompting)"], notes: notes("My own way of prompting, from my toolbox: social prompting, borrowing the method of the best.") });
 
 deck.points({
   bg: "teal",
@@ -368,7 +724,7 @@ deck.decompose({
     { tag: "4 · Use", text: "Use this method to write my 2-minute internship pitch. Here is my CV.", color: C.result },
   ],
   notes: notes(
-    "The example from yesterday's teaser, as 4 real prompts in a row, in the same chat.",
+    "A worked example: 4 real prompts in a row, in the same chat.",
     "Prompt 2 typically gives: one big idea, the rule of three, a demo, \"one more thing\". Check the answer: the AI can be wrong about famous methods too.",
     "Prompt 4: add \"Ask me questions first\" (the flip) for a far better pitch.",
     "Demo it live, then show the final pitch.",
@@ -409,7 +765,7 @@ deck.points({
 });
 
 // ── Part 5: Structures, deeper ────────────────────────────────────────────
-deck.statement({ bg: "teal", tag: "Part 5", lines: ["Prompt structures,", "*deeper*"], notes: notes("Yesterday: the six colours. Today: what makes each one powerful, and when to split a prompt.") });
+deck.statement({ bg: "teal", tag: "Part 5", lines: ["Prompt structures,", "*deeper*"], notes: notes("Part 0.6: the six colours. Now: what makes each one powerful, and when to split a prompt.") });
 
 deck.pair({
   bg: "blue",
@@ -456,7 +812,7 @@ deck.cards({
   title: "Three *power moves*",
   cards: [
     { kicker: "FEW-SHOT", label: "Show examples", note: "2–3 of what you want" },
-    { kicker: "STEP BY STEP", label: "Ask for stages", note: "plan first, then write" },
+    { kicker: "STEP BY STEP", label: "Ask in stages", note: "plan first, then write" },
     { kicker: "SELF-CHECK", label: "Ask it to check", note: "against your own rules" },
   ],
   footer: "Examples beat adjectives",
@@ -464,7 +820,7 @@ deck.cards({
   notes: notes(
     "Few-shot: give 2 or 3 examples of the result you want. \"Here are two posts I like; write a third in the same style.\" \"Shot\" = example.",
     "Step by step: ask it to work in stages: \"First list the key points, then plan, then write.\" Fewer mistakes, and you can correct each stage.",
-    "Self-check: end with \"Before you answer, check your answer against my rules and fix what doesn't fit.\" The same last step as Day 1's master prompt generator.",
+    "Self-check: end with \"Before you answer, check your answer against my rules and fix what doesn't fit.\" The same last step as the master prompt generator from part 0.6.",
     "Footer: one good example tells the AI more than ten adjectives.",
   ),
 });
@@ -550,7 +906,7 @@ deck.checklist({
 
 deck.decompose({
   bg: "purple",
-  title: "Recap: inside a *mega prompt*",
+  title: "Recap: inside a *master prompt*",
   parts: [
     { tag: "Expert role", text: "You are a recruitment and ATS expert (Taleez, Flatchr, Recruitee…) who knows their keyword logic.", color: C.role },
     { tag: "Mission", text: "Optimise the Experience section of a CV for one job ad, so it passes ATS filters.", color: C.context },
@@ -560,7 +916,7 @@ deck.decompose({
     { tag: "Deliverables", text: "The new section, the 30 keywords and a 5-line explanation.", color: C.format },
   ],
   notes: notes(
-    "My recruiting mega prompt from yesterday: the shape every master prompt follows.",
+    "My recruiting master prompt from part 0.6: the shape every master prompt follows.",
     "ATS = Applicant Tracking System: software that filters CVs by keywords before a human reads them.",
     "Look for the anatomy: an expert role, a mission, inputs requested first, numbered steps, rules you can measure, a list of deliverables.",
   ),
@@ -574,10 +930,10 @@ deck.points({
     { label: "Compare the 3 results", note: "same quality? same format?" },
     { label: "Fix what changes", note: "add a rule, an example or a step" },
     { label: "Save it as v2", note: "keep v1 too" },
-    { label: "Store it", note: "your project, a doc, the class library" },
+    { label: "Store it", note: "your project, as a skill, a doc, the class library" },
   ],
   notes: notes(
-    "Why 3 times: the AI has built-in chance (Day 1: temperature). One good run can be luck.",
+    "Why 3 times: the AI has built-in chance (part 0.5: temperature). One good run can be luck.",
     "If the results differ, the prompt leaves too much to guess. Add a measurable rule (\"exactly 5 points\"), an example, or a step.",
     "Versioning: name it \"Weekly summary v2, 14 Nov\". You'll thank yourself in a month.",
   ),
@@ -588,21 +944,24 @@ deck.points({
   title: "Exercise: your first *master prompt*",
   items: [
     { label: "Take your ODS task from Part 3" },
-    { label: "Paste the master prompt generator", note: "the handout from Day 1" },
+    { label: "Paste the master prompt generator" },
     { label: "Answer its 5 questions" },
     { label: "Run the result 3 times", note: "with real input" },
     { label: "Fix it and save v1", note: "in your course project" },
   ],
   notes: notes(
     "30 minutes, alone, then show a neighbour.",
-    "The generator is the file master_prompt_generator.md shared yesterday; share it again now.",
+    "The generator is the file master_prompt_generator.md shared in part 0.6.",
     "No ODS task? Use the weekly study summary.",
     "Walk around: check that every master prompt has measurable rules and a clear list of deliverables.",
   ),
 });
 
-// ── Part 8: Responsible use ───────────────────────────────────────────────
-deck.statement({ bg: "purple", tag: "Part 8", lines: ["Use it", "*responsibly*"], notes: notes("Three questions before you prompt: what does it cost the planet, what data am I giving, and am I being honest about it?") });
+// ── Part 8: Hack master prompts ───────────────────────────────────────────
+deck.statement({ bg: "blue", tag: "Part 8", lines: ["*Hack* master prompts", "Master prompt inception"], notes: notes("TO FILL: content for this part still to come from Fadi.") });
+
+// ── Part 9: Responsible use ───────────────────────────────────────────────
+deck.statement({ bg: "purple", tag: "Part 9", lines: ["Use AI", "*responsibly*"], notes: notes("Three questions before you prompt: what does it cost the planet, what data am I giving, and am I being honest about it?") });
 
 deck.cards({
   bg: "teal",
@@ -702,8 +1061,8 @@ deck.close({
     "Think ODS: objective, data, skill, before you type.",
     "Use the funnel: borrow the method of the best, and let the AI ask you questions.",
     "Test, then reuse: a master prompt run 3 times, versioned and stored.",
-    "Tomorrow: your master prompt becomes a bot, then your own subject expert, scheduled tasks, and AI that answers from your documents (RAG, NotebookLM).",
-    "Homework: run your master prompt once on real coursework before tomorrow.",
+    "Next session: your master prompt becomes a bot, then your own subject expert, scheduled tasks, and AI that answers from your documents (RAG, NotebookLM).",
+    "Homework: run your master prompt once on real coursework before next session.",
   ),
 });
 
