@@ -24,7 +24,7 @@ Last updated: 2 November 2026.
 **Status**
 - **Day 1** is finished: `day1/UCA_AI_Day1.pptx` has 63 slides and 296 clicks.
 - **Day 1 in class** stopped before tokens (slide 40). Day 1's slides 40–62 (tokens, chat tools, first prompting, master prompt generator) moved into Day 2 as Parts 0.5 and 0.6; the funnel teaser was dropped.
-- **Day 2** is built (v2, Fadi's edits): `day2/UCA_AI_Day2.pptx`, 78 slides, 344 clicks. Part 8 ("Hack master prompts / master prompt inception") presents Fadi's "Prompt architect" mode, a master prompt that writes master prompts (`handouts/prompt_architect_mode.md`).
+- **Day 2** is built (v2, Fadi's edits): `day2/UCA_AI_Day2.pptx`, 74 slides, 321 clicks (the version Fadi chose, 4 Nov 2026). Part 8 ("Hack master prompts / master prompt inception") is a divider plus one exercise with Fadi's "Prompt architect" mode, a master prompt that writes master prompts (`handouts/prompt_architect_mode.md`; the full prompt is in that slide's notes). The "project for one course" exercise became "Test my instructions" (his honest-advisor prompt), so Day 3 can no longer assume each student has a course project from Day 2.
 - **Days 3–5** have a detailed session plan but no slides. Section 1 has a proposed slide-by-slide outline for each; Fadi has not approved them.
 
 **Decided (2 Nov 2026): the course is now five days.** The approved plan had 6 days of 7 hours; Fadi confirmed it is now 5. Day 6 (capstone) is dropped as a separate day; the final repeat of the positioning quiz moves to the end of Day 5. How much of the capstone (if any) moves into Day 5 is still open. Day 6 stays at the end of section 1 for reference only.
