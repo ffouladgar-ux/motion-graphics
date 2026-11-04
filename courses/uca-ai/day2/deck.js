@@ -958,7 +958,106 @@ deck.points({
 });
 
 // ── Part 8: Hack master prompts ───────────────────────────────────────────
-deck.statement({ bg: "blue", tag: "Part 8", lines: ["*Hack* master prompts", "Master prompt inception"], notes: notes("TO FILL: content for this part still to come from Fadi.") });
+deck.statement({ bg: "blue", tag: "Part 8", lines: ["*Hack* master prompts", "Master prompt inception"], notes: notes("Inception: a master prompt that writes master prompts. My \"Prompt architect\" mode: you paste it once at the start of a chat, and from then on it turns every request into a structured master prompt.") });
+
+deck.points({
+  bg: "teal",
+  title: "Prompt architect *mode*",
+  items: [
+    { label: "Don't run the request", note: "not straight away" },
+    { label: "Ask me questions, one at a time", note: "never all at once" },
+    { label: "Build a structured prompt", note: "from my template, next slide" },
+    { label: "Deliver it ready to use", note: "with another AI, or with you" },
+  ],
+  notes: notes(
+    "Paste the architect prompt at the start of a conversation. From then on, for every new request, the AI follows these 4 rules.",
+    "1. It does not do the task: it designs the prompt for the task.",
+    "2. It interviews you, one question at a time, like the flip in Part 4.",
+    "3. It writes a structured prompt with my template.",
+    "4. It hands you the final prompt, ready to paste into ChatGPT, Claude, Gemini, or the same chat.",
+    "The master prompt generator from part 0.6 does the same job in 5 questions; this is my own, stricter version.",
+  ),
+});
+
+deck.decompose({
+  bg: "purple",
+  title: "The template it *fills in*",
+  parts: [
+    { tag: "Persona + goal", text: "[Expert persona + precise field] [Main objective of the task]", color: C.role },
+    { tag: "1 · Inputs", text: "The data the user must provide.", color: C.context },
+    { tag: "2–3 · Analysis", text: "Analyse the target, the offer or source document, then the existing content.", color: C.objective },
+    { tag: "4 · Rules", text: "Rewrite or generate with measurable rules: format, length, style, keywords.", color: C.constraints },
+    { tag: "5 · Deliverables", text: "The mandatory outputs, section by section.", color: C.result },
+    { tag: "6 · Constraints", text: "Technical limits (formats, fonts), then: when X is provided, generate Y.", color: C.format },
+  ],
+  notes: notes(
+    "The same anatomy as my ATS CV master prompt (part 0.6): that's where this template comes from.",
+    "Persona + goal: the expert and the task, in one line each.",
+    "1. Inputs: what the user must give before anything happens.",
+    "2–3. Analysis: first the target, offer or source document; then the user's existing content (a CV, a text…).",
+    "4. Rules with numbers: \"6 lines\", \"85–90 characters\", \"30 keywords\". Numbers make the result predictable.",
+    "5. Deliverables: exactly what comes out. 6. Technical constraints, and the trigger: \"when the user has provided X, generate Y\".",
+  ),
+});
+
+deck.points({
+  bg: "amber",
+  title: "The *7 questions* it asks",
+  items: [
+    { label: "The task", note: "\"optimise a CV for ATS\"" },
+    { label: "The expert persona", note: "with 2–3 key skills" },
+    { label: "The inputs", note: "what the user will provide" },
+    { label: "The rules, with numbers", note: "lines, characters, keywords" },
+    { label: "The deliverables", note: "what must come out" },
+    { label: "The forbidden formats", note: "no tables, no icons, .docx…" },
+    { label: "The trigger", note: "when to run it" },
+  ],
+  notes: notes(
+    "One question at a time, always in this order.",
+    "1. The task, e.g. \"optimise a CV for ATS\", \"write an SEO cover letter\", \"create a training plan\".",
+    "2. The expert persona, with 2–3 key skills: a French ATS recruiter, a LinkedIn expert, an SEO writer, a data scientist…",
+    "3. The inputs the user must provide: current CV + job ad; a blog article + target keywords; a script + logs.",
+    "4. The rules with numbers: 6 lines per section, 85–90 characters, 30 keywords, a set font…",
+    "5. The deliverables: a rewritten version, a keyword list, an ATS explanation, a comparison table.",
+    "6. Technical constraints or forbidden formats: no tables, no icons, .docx format, standard headings.",
+    "7. The trigger: \"when the user has shared their CV and the job ad\", immediately, or after a step is approved.",
+  ),
+});
+
+deck.decompose({
+  bg: "blue",
+  title: "In action: a *LinkedIn job ad*",
+  parts: [
+    { tag: "You", text: "I want a prompt to write a LinkedIn-optimised job description.", color: C.role },
+    { tag: "Question 1", text: "What exactly is the subject? A job description for which job?", color: C.context },
+    { tag: "You", text: "Digital product manager.", color: C.role },
+    { tag: "Question 2", text: "Which expert personas? A tech recruiter, a LinkedIn SEO writer, an ATS expert…", color: C.context },
+    { tag: "You", text: "A French ATS expert + a LinkedIn copywriter.", color: C.role },
+    { tag: "After 7 questions", text: "A structured prompt, ready to use.", color: C.result },
+  ],
+  notes: notes(
+    "The conversation, line by line: the student asks for a prompt, the AI answers with a question, not a result.",
+    "Question 3 would be: what data will the user provide (job title, raw tasks, company…)? And so on.",
+    "After the 7th answer, it delivers the finished master prompt. Demo it live if you can.",
+  ),
+});
+
+deck.points({
+  bg: "coral",
+  title: "Exercise: *architect* your prompt",
+  items: [
+    { label: "Paste the architect prompt", note: "in a new chat" },
+    { label: "Ask for the prompt you need", note: "a real task from your studies or job search" },
+    { label: "Answer its 7 questions", note: "one at a time" },
+    { label: "Test the prompt it gives you", note: "in another new chat" },
+    { label: "Save it as v1", note: "in the class library" },
+  ],
+  notes: notes(
+    "20 minutes, alone. The architect prompt is in the students' shared doc, ready to copy.",
+    "Ideas: a cover letter for one job ad, a weekly revision plan, a LinkedIn \"About\" section.",
+    "Compare with the master prompt from Part 7: which one is more precise?",
+  ),
+});
 
 // ── Part 9: Responsible use ───────────────────────────────────────────────
 deck.statement({ bg: "purple", tag: "Part 9", lines: ["Use AI", "*responsibly*"], notes: notes("Three questions before you prompt: what does it cost the planet, what data am I giving, and am I being honest about it?") });
