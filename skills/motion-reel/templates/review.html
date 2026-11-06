@@ -1,0 +1,92 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>/*TITLE*/ review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#E9E7E2; --panel:#FFFFFF; --ink:#0B0B0B; --muted:#7D7A74; --line:#DEDAD3; --soft:#F3F1ED; --acc:#FF5A1F; --stage:#D9D6D0;
+  --sans:'Geist',system-ui,-apple-system,sans-serif; --mono:'Geist Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141412;--panel:#1D1C1A;--ink:#F2F0EC;--muted:#9C9891;--line:#34322E;--soft:#262522;--stage:#0B0B0A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141412;--panel:#1D1C1A;--ink:#F2F0EC;--muted:#9C9891;--line:#34322E;--soft:#262522;--stage:#0B0B0A;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 48px;display:grid;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px}
+h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);font-size:14px}
+.player{background:var(--panel);border-radius:18px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.05),0 12px 32px -14px rgba(0,0,0,.18)}
+.screen{position:relative;aspect-ratio:16/9;background:var(--stage)}
+video{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bar{padding:14px 16px 16px;display:grid;gap:12px}
+.track{position:relative;height:44px;border-radius:10px;background:var(--soft);cursor:pointer;touch-action:none;overflow:hidden}
+.sc{position:absolute;top:0;bottom:0;border-right:2px solid var(--panel);display:flex;align-items:flex-end;padding:0 8px 5px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.sc.on{background:color-mix(in srgb,var(--acc) 14%,transparent);color:var(--ink)}
+.bt{position:absolute;top:0;width:1px;height:10px;background:var(--muted);opacity:.55}
+.head{position:absolute;top:0;bottom:0;width:2px;background:var(--acc);pointer-events:none}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button{font:inherit;font-size:14px;font-weight:500;color:var(--ink);background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--muted)}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tc{font-family:var(--mono);font-size:13px;background:var(--soft);border-radius:8px;padding:4px 9px;font-variant-numeric:tabular-nums}
+.spacer{flex:1}
+.hint{font-size:12.5px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:14px;background:var(--panel);border-radius:14px;overflow:hidden}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:500;color:var(--muted);font-size:13px}
+td.m{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr[data-on="true"] td{background:var(--soft)}
+tbody tr{cursor:pointer}
+.tablewrap{overflow-x:auto;border-radius:14px}
+</style></head><body>
+<div class="wrap">
+  <header><h1>/*TITLE*/</h1><span class="sub">Check it frame by frame: step with , and . — jump scenes with [ and ]</span></header>
+  <section class="player" aria-label="Reel player">
+    <div class="screen"><video id="v" src="/*SRC*/" playsinline preload="auto"></video></div>
+    <div class="bar">
+      <div class="track" id="track" role="slider" aria-label="Timeline" tabindex="0"></div>
+      <div class="controls">
+        <button type="button" id="play">Play</button>
+        <button type="button" id="prev" title="Previous frame (,)">‹ Frame</button>
+        <button type="button" id="next" title="Next frame (.)">Frame ›</button>
+        <button type="button" id="loop" aria-pressed="false" title="Loop the current scene (L)">Loop scene</button>
+        <button type="button" id="slow" aria-pressed="false" title="Quarter speed (S)">¼ speed</button>
+        <span class="spacer"></span>
+        <span class="tc" id="tc">0:00.00 · f0</span>
+      </div>
+      <div class="hint" id="hint"></div>
+    </div>
+  </section>
+  <div class="tablewrap"><table><thead><tr><th>#</th><th>Scene</th><th>Beats</th><th>In</th><th>Out</th><th>What it shows</th></tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+<script>
+const FPS=/*FPS*/60, SC=/*SCENES*/[], BEATS=/*BEATS*/[], DUR=/*DUR*/0||1;
+const v=document.getElementById('v'), track=document.getElementById('track'), $=id=>document.getElementById(id);
+const fmt=t=>`${Math.floor(t/60)}:${(t%60).toFixed(2).padStart(5,'0')}`;
+SC.forEach((s,i)=>{const d=document.createElement('div');d.className='sc';d.style.left=(s.in/DUR*100)+'%';d.style.width=((s.out-s.in)/DUR*100)+'%';d.textContent=s.id+' '+s.name;d.dataset.i=i;track.appendChild(d);
+  const r=document.createElement('tr');r.dataset.i=i;r.innerHTML=`<td class="m">${s.id}</td><td>${s.name}</td><td class="m">${s.beats}</td><td class="m">${fmt(s.in)}</td><td class="m">${fmt(s.out)}</td><td>${s.shows||''}</td>`;r.onclick=()=>{v.currentTime=s.in+0.001;};$('rows').appendChild(r);});
+BEATS.forEach(b=>{const d=document.createElement('div');d.className='bt';d.style.left=(b/DUR*100)+'%';track.appendChild(d);});
+const head=document.createElement('div');head.className='head';track.appendChild(head);
+const cur=()=>{const t=v.currentTime;let i=SC.findIndex(s=>t>=s.in&&t<s.out);return i<0?SC.length-1:i;};
+let loop=false, loopScene=0;
+const tick=()=>{const t=v.currentTime,i=cur();head.style.left=(t/DUR*100)+'%';$('tc').textContent=`${fmt(t)} · f${Math.round(t*FPS)}`;
+  track.querySelectorAll('.sc').forEach((d,k)=>d.classList.toggle('on',k===i));document.querySelectorAll('#rows tr').forEach((r,k)=>r.dataset.on=k===i);
+  const nb=BEATS.reduce((a,b)=>Math.abs(b-t)<Math.abs(a-t)?b:a,BEATS[0]||0);$('hint').textContent=SC[i]?`Scene ${SC[i].id} · ${SC[i].name} · nearest beat ${fmt(nb)} (${((t-nb)*1000).toFixed(0)} ms)`:'';
+  if(loop&&!v.paused){const s=SC[loopScene];if(s&&(t>=s.out-1/FPS||t<s.in))v.currentTime=s.in;}
+  requestAnimationFrame(tick);};
+requestAnimationFrame(tick);
+const step=n=>{v.pause();v.currentTime=Math.max(0,Math.min(DUR,(Math.round(v.currentTime*FPS)+n+0.5)/FPS));};
+const jump=n=>{const i=Math.max(0,Math.min(SC.length-1,cur()+n));v.currentTime=SC[i].in+0.001;};
+$('play').onclick=()=>v.paused?v.play():v.pause();
+v.onplay=()=>$('play').textContent='Pause'; v.onpause=()=>$('play').textContent='Play';
+$('prev').onclick=()=>step(-1); $('next').onclick=()=>step(1);
+$('loop').onclick=()=>{loop=!loop;loopScene=cur();$('loop').setAttribute('aria-pressed',loop);};
+$('slow').onclick=()=>{const on=v.playbackRate===1;v.playbackRate=on?0.25:1;$('slow').setAttribute('aria-pressed',on);};
+const seekX=e=>{const r=track.getBoundingClientRect();v.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*DUR;};
+track.addEventListener('pointerdown',e=>{track.setPointerCapture(e.pointerId);seekX(e);track.onpointermove=seekX;});
+track.addEventListener('pointerup',()=>track.onpointermove=null);
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;const k=e.key;
+  if(k===',')step(-1);else if(k==='.')step(1);else if(k==='[')jump(-1);else if(k===']')jump(1);
+  else if(k===' '){e.preventDefault();$('play').click();}else if(k==='l'||k==='L')$('loop').click();else if(k==='s'||k==='S')$('slow').click();});
+</script>
+</body></html>

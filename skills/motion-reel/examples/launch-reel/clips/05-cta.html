@@ -1,0 +1,38 @@
+<title>05 CTA</title>
+<style>
+.lg{transform:translate(-50%,-50%);gap:20px;color:var(--n0);font-size:58px}
+.mk{width:72px;height:72px;border-radius:20px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.cn{position:absolute;left:-420px;top:-130px;gap:20px;font-size:64px}
+.tg{position:absolute;left:-420px;top:-24px;font-size:34px;color:var(--n1);white-space:nowrap}
+.go{position:absolute;left:-420px;top:52px;height:84px;border-radius:42px;background:var(--accent);color:var(--n0);display:flex;align-items:center;gap:14px;padding:0 34px;font-size:30px;font-weight:600;white-space:nowrap;transform-origin:50% 50%}
+.ok{position:absolute;left:-420px;top:52px;height:84px;display:flex;align-items:center;gap:12px;font-size:30px;font-weight:600;color:var(--ink);white-space:nowrap}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Llogo"><div class="row lg display"><span class="mk" id="m0"></span>Tidepool</div></div>
+  <div class="L" id="Lcard">
+    <div class="row cn display"><span class="mk" id="m1"></span>Tidepool</div>
+    <div class="tg">Every channel. One inbox.</div>
+    <div class="go" id="go">Start free<span id="icA"></span></div>
+    <div class="ok" id="ok"><span id="icOk"></span>You’re in</div>
+  </div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+['m0','m1'].forEach(id=>$(id).innerHTML=M.icon('inbox',40,R.C.n0));
+$('icA').innerHTML=M.icon('arrow',28,R.C.n0); $('icOk').innerHTML=M.icon('check',32,R.C.accent,3);
+const [b0,b2,b4]=R.bs(0,2,4);
+M.scene({
+  W:1920,H:1080,bg:R.C.canvas,T:R.T,intro:b0,
+  SH:{logo:{w:420,h:124,r:62,bg:R.C.ink,cam:1.9}, card:{w:960,h:400,r:48,bg:R.C.n0,cam:1.4}},
+  start:'logo', SEQ:[[b2,'card']],
+  layers:[
+    {el:'Llogo',tin:b0,tout:b2},
+    {el:'Lcard',tin:b2,tout:null,update:t=>{
+      const k=R.kick(t,[b4],0.1);
+      M.apply($('go'),M.vis(t,R.b(2.5),R.b(4.5),{din:0,lin:0.2}),` scale(${(1-0.06*k).toFixed(4)})`);
+      M.apply($('ok'),M.vis(t,R.b(4.5),null,{din:0.04,lin:0.22}));
+    }},
+  ],
+  cursor:{size:44,clicks:[b4],keys:[[0,380,260],[R.b(2.8),380,260],[R.b(3.8),-260,95],[b4,-260,95],[R.b(5.4),-150,170]]},
+});
+</script>

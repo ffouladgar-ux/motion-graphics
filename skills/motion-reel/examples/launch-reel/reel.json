@@ -1,0 +1,24 @@
+{
+  "title": "Tidepool launch reel",
+  "fps": 60,
+  "size": [1920, 1080],
+  "brand": "brand.json",
+  "music": null,
+  "beats": null,
+  "bpm": 120,
+  "offset": 0,
+  "start_beat": 0,
+  "fade_out": 1.0,
+  "scenes": [
+    {"id": "01", "name": "Hook", "file": "clips/01-hook.html", "beats": 8, "shows": "Channel pill flips Email → Chat → Phone → Social on the beat, then “Four tabs. Four queues. One inbox.”"},
+    {"id": "02", "name": "Product", "file": "clips/02-product.html", "beats": 12, "shows": "Inbox fills on the beat; click a ticket, draft a reply, send, Resolved."},
+    {"id": "03", "name": "Proof", "file": "clips/03-proof.html", "beats": 8, "shows": "Before vs with Tidepool, tickets resolved per agent (relative bars)."},
+    {"id": "04", "name": "Kinetic", "file": "clips/04-kinetic.html", "beats": 6, "shows": "Sort. Draft. Resolve. with an underline that rides each word."},
+    {"id": "05", "name": "CTA", "file": "clips/05-cta.html", "beats": 6, "shows": "Logo → card with tagline and Start free, clicked."}
+  ],
+  "notes": [
+    "Tidepool is a made-up product for this example.",
+    "Scene 03's bars are illustrative: relative size only, no figures.",
+    "Ticket subjects and skeleton lines in scene 02 are placeholders."
+  ]
+}

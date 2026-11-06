@@ -1,0 +1,11 @@
+{
+  "name": "Tidepool",
+  "colors": {"canvas": "#F2F0EA", "ink": "#0E1A24", "accent": "#2F6BFF"},
+  "neutrals": ["#FFFFFF", "#7F8A94", "#E4E2DB"],
+  "fonts": {
+    "display": {"family": "Geist", "weight": 600},
+    "body": {"family": "Geist", "weight": 400}
+  },
+  "logo": null,
+  "voice": "Short, plain, confident. Full stops, no exclamation marks."
+}

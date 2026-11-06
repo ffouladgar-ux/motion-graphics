@@ -1,0 +1,27 @@
+<title>04 Kinetic</title>
+<style>
+#kr{position:absolute;left:-1000px;top:-95px;width:2000px;display:flex;justify-content:center;gap:110px}
+.kw{font-size:150px;line-height:150px;white-space:nowrap}
+</style>
+<div data-slot="world"><div id="kr">
+  <div class="kw display" id="k0">Sort.</div>
+  <div class="kw display" id="k1">Draft.</div>
+  <div class="kw display" id="k2">Resolve.</div>
+</div></div><!--/world-->
+<div data-slot="shape"></div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+const BT=R.bs(0,2,4);
+// underline: left and right edges on different springs, so it stretches toward the next word.
+// Word boxes are measured from the DOM each frame (offset* ignore transforms), so any font or copy fits.
+const edges=()=>{const ks=[0,1,2].map(i=>$('k'+i)), W=ks.map(k=>k.offsetWidth), CX=ks.map((k,i)=>-1000+k.offsetLeft+W[i]/2);
+  return [M.track(CX[0]-W[0]/2,[1,2].map(i=>[BT[i],CX[i]-W[i]/2,M.SLOW])), M.track(CX[0]+W[0]/2,[1,2].map(i=>[BT[i],CX[i]+W[i]/2,M.FAST]))];};
+const col=[0,1,2].map(i=>M.ctrack(R.C.n2,[[BT[i],R.C.ink,[22,1]],...(i<2?[[BT[i+1],R.C.n1,[14,1]]]:[])]));
+M.scene({
+  W:1920,H:1080,bg:R.C.canvas,T:R.T,intro:0,
+  SH:{u:{w:330,h:16,r:8,bg:R.C.accent,cam:1}},
+  start:'u', SEQ:[],
+  geom:(t,g)=>{const [eL,eR]=edges(),l=eL(t),r=eR(t); g.w=r-l; g.cx=(l+r)/2; g.cy=92; g.sc*=1+0.1*R.kick(t,BT.slice(1)); return g;},
+  extra:t=>{[0,1,2].forEach(i=>{const e=$('k'+i); e.style.color=col[i](t); e.style.transform=`translateY(${(-0.06*R.kick(t,[BT[i]],0.14)*100).toFixed(2)}px)`;});},
+});
+</script>

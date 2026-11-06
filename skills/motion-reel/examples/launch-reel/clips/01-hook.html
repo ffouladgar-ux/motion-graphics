@@ -1,0 +1,38 @@
+<title>01 Hook</title>
+<style>
+.ch{transform:translate(-50%,-50%);gap:16px;color:#FFFFFF;font-size:52px;font-weight:600;letter-spacing:-.02em}
+.big{transform:translate(-50%,-50%);font-size:84px;line-height:1}
+.one{transform:translate(-50%,-50%);font-size:120px;line-height:1;color:#FFFFFF}
+.one .w:first-child{color:var(--accent)}
+</style>
+<div data-slot="shape">
+  <div class="L" id="L0"><div class="row ch"><span class="ic"></span>Email</div></div>
+  <div class="L" id="L1"><div class="row ch"><span class="ic"></span>Chat</div></div>
+  <div class="L" id="L2"><div class="row ch"><span class="ic"></span>Phone</div></div>
+  <div class="L" id="L3"><div class="row ch"><span class="ic"></span>Social</div></div>
+  <div class="L" id="Lfour"><div class="row big display" id="four"></div></div>
+  <div class="L" id="Lone"><div class="row one display" id="one"></div></div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+['mail','chat','phone','user'].forEach((n,i)=>$('L'+i).querySelector('.ic').innerHTML=M.icon(n,44,'#FFFFFF'));
+const [b0,b1,b2,b3,b4,b6]=R.bs(0,1,2,3,4,6);
+const four=R.words($('four'),'Four tabs. Four queues.',R.bs(4.05,4.5,5,5.5));
+const one=R.words($('one'),'One inbox.',R.bs(6.05,6.5));
+M.scene({
+  W:1920,H:1080,bg:R.C.canvas,T:R.T,intro:b0,
+  SH:{
+    e:{w:300,h:120,r:60,bg:R.C.ink,cam:2.0}, c:{w:272,h:120,r:60,bg:R.C.ink,cam:2.0},
+    p:{w:312,h:120,r:60,bg:R.C.ink,cam:2.0}, s:{w:316,h:120,r:60,bg:R.C.ink,cam:2.0},
+    four:{w:1240,h:260,r:44,bg:R.C.n0,cam:1.25}, one:{w:820,h:260,r:44,bg:R.C.ink,cam:1.45},
+  },
+  start:'e', SEQ:[[b1,'c'],[b2,'p'],[b3,'s'],[b4,'four'],[b6,'one']],
+  layers:[
+    {el:'L0',tin:b0,tout:b1,o:{din:0.02}},{el:'L1',tin:b1,tout:b2,o:{din:0.02}},
+    {el:'L2',tin:b2,tout:b3,o:{din:0.02}},{el:'L3',tin:b3,tout:b4,o:{din:0.02}},
+    {el:'Lfour',tin:b4,tout:b6,update:t=>four(t)},
+    {el:'Lone',tin:b6,tout:null,update:t=>one(t)},
+  ],
+  geom:(t,g)=>{g.sc*=1+0.05*R.kick(t,[b1,b2,b3]); return g;},
+});
+</script>

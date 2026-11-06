@@ -1,0 +1,64 @@
+<title>02 Product</title>
+<style>
+.hd{left:-560px;top:40px;gap:14px;font-size:34px;font-weight:600;letter-spacing:-.02em}
+.chip{position:absolute;right:-560px;top:40px;height:46px;padding:0 18px;border-radius:23px;background:var(--n2);display:flex;align-items:center;font-size:20px;font-weight:500;color:var(--ink)}
+.tk{position:absolute;left:-560px;width:1120px;height:100px;border-radius:22px;background:var(--canvas);display:flex;align-items:center;gap:22px;padding:0 24px;box-sizing:border-box}
+.tk .ib{width:56px;height:56px;border-radius:16px;background:var(--n0);display:flex;align-items:center;justify-content:center;flex:none}
+.tk .sj{font-size:27px;font-weight:500;white-space:nowrap;width:330px}
+.tk .sk{height:14px;border-radius:7px;background:var(--n2);flex:1}
+.tk .tg{font-size:19px;color:var(--n1);width:90px;text-align:right}
+.dh{left:-430px;top:44px;gap:16px;font-size:38px;font-weight:600;letter-spacing:-.02em;white-space:nowrap}
+.ds{position:absolute;left:-430px;top:102px;font-size:21px;color:var(--n1)}
+.bub{position:absolute;left:-430px;top:160px;width:560px;height:118px;border-radius:24px 24px 24px 8px;background:var(--canvas)}
+.ln{position:absolute;height:14px;border-radius:7px;background:var(--n2)}
+.box{position:absolute;left:-430px;top:310px;width:860px;height:200px;border-radius:24px;border:2px solid var(--n2);box-sizing:border-box}
+.btn{position:absolute;height:68px;border-radius:34px;display:flex;align-items:center;gap:12px;padding:0 28px;font-size:25px;font-weight:600;white-space:nowrap;color:var(--n0)}
+.done{transform:translate(-50%,-50%);gap:16px;color:var(--n0);font-size:52px;font-weight:600;letter-spacing:-.02em}
+</style>
+<div data-slot="shape">
+  <div class="L" id="Llist">
+    <div class="row hd"><span id="icIn"></span>Inbox</div>
+    <div class="chip">All channels</div>
+    <div class="tk" id="r0" style="top:128px"><span class="ib"></span><span class="sj">Order hasn’t arrived</span><span class="sk"></span><span class="tg">Chat</span></div>
+    <div class="tk" id="r1" style="top:244px"><span class="ib"></span><span class="sj">Change my plan</span><span class="sk" style="margin-right:120px"></span><span class="tg">Email</span></div>
+    <div class="tk" id="r2" style="top:360px"><span class="ib"></span><span class="sj">Invoice question</span><span class="sk" style="margin-right:60px"></span><span class="tg">Phone</span></div>
+    <div class="tk" id="r3" style="top:476px"><span class="ib"></span><span class="sj">Can’t log in</span><span class="sk" style="margin-right:200px"></span><span class="tg">Social</span></div>
+  </div>
+  <div class="L" id="Ldet">
+    <div class="row dh"><span id="icCh"></span>Order hasn’t arrived</div>
+    <div class="ds">Chat · Customer</div>
+    <div class="bub"><div class="ln" style="left:30px;top:38px;width:470px"></div><div class="ln" style="left:30px;top:68px;width:330px"></div></div>
+    <div class="box">
+      <div class="ln" id="d0" style="left:34px;top:40px"></div><div class="ln" id="d1" style="left:34px;top:72px"></div><div class="ln" id="d2" style="left:34px;top:104px"></div>
+    </div>
+    <div class="btn" id="draft" style="left:-130px;top:376px;background:var(--ink)"><span id="icZ"></span>Draft reply</div>
+    <div class="btn" id="send" style="left:250px;top:530px;background:var(--accent)"><span id="icS"></span>Send</div>
+  </div>
+  <div class="L" id="Ldone"><div class="row done"><span id="icOk"></span>Resolved</div></div>
+</div><!--/shape-->
+<script>
+const $=id=>document.getElementById(id);
+$('icIn').innerHTML=M.icon('inbox',34,R.C.ink); $('icCh').innerHTML=M.icon('chat',36,R.C.ink);
+['chat','mail','phone','user'].forEach((n,i)=>$('r'+i).querySelector('.ib').innerHTML=M.icon(n,28,R.C.ink));
+$('icZ').innerHTML=M.icon('zap',26,R.C.accent); $('icS').innerHTML=M.icon('send',24,R.C.n0); $('icOk').innerHTML=M.icon('check',46,R.C.n0,3);
+const RT=R.bs(0.5,1,1.5,2), [b4,b6,b8,b9,b10]=R.bs(4,6,8,9,10);
+const hov=M.track(0,[[R.b(3.5),1,M.FAST],[b4,0,M.INSTANT]]);
+const DW=[0.92,0.8,0.55], dl=DW.map((w,i)=>M.track(0,[[R.b(6.25+i*0.5),w,[9,0.95]]]));
+M.scene({
+  W:1920,H:1080,bg:R.C.canvas,T:R.T,intro:0,
+  SH:{list:{w:1240,h:620,r:44,bg:R.C.n0,cam:1.15}, det:{w:980,h:640,r:40,bg:R.C.n0,cam:1.2}, done:{w:420,h:124,r:62,bg:R.C.accent,cam:1.9}},
+  start:'list', SEQ:[[b4,'det'],[b10,'done']],
+  shapePress:[b4],
+  layers:[
+    {el:'Llist',tin:null,tout:b4,anchor:'t',update:t=>{RT.forEach((rt,i)=>{const e=$('r'+i),v=M.vis(t,rt,null,{din:0,lin:0.2});
+      e.style.opacity=v.o; e.style.filter=v.blur>0.05?`blur(${v.blur}px)`:'none'; e.style.transform=`translateY(${(1-M.S(t-rt,16,0.82))*28}px)`;});
+      $('r0').style.background=M.ctrack(R.C.canvas,[[R.b(3.5),R.C.n2]])(t);}},
+    {el:'Ldet',tin:b4,tout:b10,anchor:'t',update:t=>{
+      const dv=M.vis(t,b4,b6,{lout:0.14}); M.apply($('draft'),dv);
+      DW.forEach((w,i)=>$('d'+i).style.width=(790*Math.max(0,dl[i](t)))+'px');
+      M.apply($('send'),M.vis(t,b8,null,{din:0,lin:0.2}),` scale(${(1-0.06*R.kick(t,[b9],0.1)).toFixed(4)})`);}},
+    {el:'Ldone',tin:b10,tout:null},
+  ],
+  cursor:{size:44,clicks:[b4,b6,b9],keys:[[0,700,420],[R.b(2.6),700,420],[R.b(3.6),120,-132],[b4,120,-132],[R.b(5.4),40,95],[b6,40,95],[R.b(7.2),40,95],[R.b(8.6),398,256],[b9,398,256],[b10,398,256],[R.b(11),230,150]]},
+});
+</script>
